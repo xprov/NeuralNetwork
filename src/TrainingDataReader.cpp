@@ -9,6 +9,7 @@
 #include <iosfwd>
 #include <algorithm>
 #include <iostream>
+#include <string.h>
 
 //-------------------------------------------------------------------------
 
@@ -47,13 +48,13 @@ namespace BPN
                     m_entries.push_back( TrainingEntry() );
                     TrainingEntry& entry = m_entries.back();
 
-                    char* cstr = new char[line.size() + 1];
-                    strcpy_s( cstr, line.size() + 1, line.c_str() );
+                    char cstr[line.size() + 1];
+                    strncpy( cstr, line.c_str(), line.size() + 1);
 
                     // Read values
                     int i = 0;
                     char* nextToken = nullptr;
-                    char* pToken = strtok_s( cstr, ",", &nextToken );
+                    char* pToken = strtok_r( cstr, ",", &nextToken );
 
                     while ( pToken != nullptr && i < totalValuesToRead )
                     {
@@ -67,7 +68,7 @@ namespace BPN
                             entry.m_expectedOutputs.push_back( (int32_t) outputValue );
                         }
 
-                        pToken = strtok_s( nullptr, ",", &nextToken );
+                        pToken = strtok_r( nullptr, ",", &nextToken );
                         i++;
                     }
                 }
@@ -120,3 +121,4 @@ namespace BPN
         }
     }
 }
+
