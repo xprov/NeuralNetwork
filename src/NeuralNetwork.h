@@ -55,6 +55,17 @@ namespace BPN
 
       std::string serialize() const;
       void deserialize(std::istream& is);
+
+      inline int32_t getNumInputs() 
+        {
+          return m_numInputs;
+        }
+
+      inline int32_t getNumOutputs() 
+        {
+          return m_numInputs;
+        }
+
   private:
       void loadFromFile(const char* filename);
       void InitializeNetwork();

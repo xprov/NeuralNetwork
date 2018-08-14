@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <iostream>
 #include <sstream>
+#include <fstream>
+#include <assert.h>
 
 #include "NeuralNetworkTrainer.h"
 #include "TrainingDataReader.h"
@@ -42,11 +44,12 @@ int main( int argc, char* argv[] )
 
   cli::Parser cmdParser( argc, argv );
   cmdParser.set_required<std::string>( "d", "dataFile", "Path to training data csv file." );
-  cmdParser.set_required<uint32_t>( "in", "numInputs", "Num Input neurons." );
-  cmdParser.set_required<std::string>( "hidden", "numHidden", "Comma separated list of the hidden layers sizes (e.g.: 3,2,3 or 1)." );
-  cmdParser.set_required<uint32_t>( "out", "numOutputs", "Num Output neurons." );
+  cmdParser.set_optional<std::string>( "l", "layers", "[]", "Comma separated list of the layers sizes (e.g. 16,4,4,3 or 1,1,1).\n     First layer is the input neurons.\n     Last layer is the output layer." );
+  cmdParser.set_optional<std::string>( "i", "import", "", "Import neural network from file before training. ( \"-\" stands for stdin)" );
+  cmdParser.set_optional<std::string>( "e", "export", "", "Export neural network to file after training. ( \"-\" stands for stdout)" );
+
   cmdParser.set_optional<uint32_t>( "m", "maxEpoch", 100, "Maximum num of iterations." );
-  cmdParser.set_optional<double>( "l", "learningRate", 0.01, "Multiplicative coefficient on error gradient" );
+  cmdParser.set_optional<double>( "r", "learningRate", 0.01, "Multiplicative coefficient on error gradient" );
   cmdParser.set_optional<double>( "mom", "momentum", 0.9, "Multiplicative coefficient applied on previous error delta when non using batch learning." );
   cmdParser.set_optional<bool>( "b", "batchLearning", false, "Use batch learning (1 : yes, 0 : no)." );
   cmdParser.set_optional<double>( "a", "accuracy", 95, "Desired accuracy. Training stops when the desired accuracy is obtained." );
@@ -58,31 +61,72 @@ int main( int argc, char* argv[] )
       return 1;
     }
 
-  std::string       trainingDataPath  = cmdParser.get<std::string>( "d" ).c_str();
-  uint32_t const    numInputs         = cmdParser.get<uint32_t>( "in" );
-  std::string const numsHiddens       = cmdParser.get<std::string>( "hidden" );
-  uint32_t const    numOutputs        = cmdParser.get<uint32_t>( "out" );
+  std::string const trainingDataPath  = cmdParser.get<std::string>( "d" ).c_str();
+  std::string const layers            = cmdParser.get<std::string>( "l" );
+  std::string const importFile        = cmdParser.get<std::string>( "i" );
+  std::string const expotFile         = cmdParser.get<std::string>( "e" );
   uint32_t const    maxEpoch          = cmdParser.get<uint32_t>( "m" );
-  double            learningRate      = cmdParser.get<double>( "l" );
+  double            learningRate      = cmdParser.get<double>( "r" );
   double            momentum          = cmdParser.get<double>( "mom" );
   bool              batchLearning     = cmdParser.get<bool>( "b" );
   double            accuracy          = cmdParser.get<double>( "a" );
   int32_t           verbosity         = cmdParser.get<int32_t>( "v" );
 
-  // Read layers sizes. The first layer is the input layer, the last layer
-  // is the output. All other layers are hidden.
-  std::vector<int> hiddenLayersSizes;
-  std::stringstream ss(numsHiddens);
-  ss >> hiddenLayersSizes;
+  if ( layers.compare("[]") == 0 && importFile.compare("") == 0 )
+    {
+      std::cerr << "At least one parameter among -l or -i must be specified. (See help for more impormations)" << std::endl;
+      exit(1);
+    }
 
-  std::vector<int> layerSizes;
-  layerSizes.push_back(numInputs);
-  layerSizes.insert( layerSizes.end(), hiddenLayersSizes.begin(), hiddenLayersSizes.end() );
-  layerSizes.push_back(numOutputs);
+  if ( layers.compare("[]") != 0 && importFile.compare("") != 0 )
+    {
+      std::cerr << "Only one parameter among -l and -i may be specified. (See help for more impormations)" << std::endl;
+      exit(1);
+    }
+
+  // Select activation function
+  //
+  BPN::ActivationFunction* sigma = new BPN::Sigmoid();
+  //BPN::ActivationFunction* sigma = new BPN::Sigmoid(2.0);
+  //BPN::ActivationFunction* sigma = new BPN::ReLU();
+
+  // Create neural network
+  BPN::Network* nn = NULL;;
+
+  if ( layers.compare("[]") != 0 )
+    {
+
+      // Read layers sizes. The first layer is the input layer, the last layer
+      // is the output. All other layers are hidden.
+      std::vector<int> layerSizes;
+      std::stringstream ss(layers);
+      ss >> layerSizes;
+
+      nn = new BPN::Network( layerSizes, sigma );
+    }
+  else if ( importFile.compare("") != 0 )
+    {
+      if ( importFile.compare("-") == 0 )
+        {
+          nn = new BPN::Network( std::cin );
+        }
+      else
+        {
+          std::fstream fs;
+          fs.open( importFile, std::fstream::in );
+          nn = new BPN::Network( fs );
+        }
+    }
+
+  assert( nn != NULL );
+
+  if (verbosity >= 2)
+    {
+      std::cout << *nn << std::endl;
+    }
 
 
-
-  BPN::TrainingDataReader dataReader( trainingDataPath, numInputs, numOutputs );
+  BPN::TrainingDataReader dataReader( trainingDataPath, nn->getNumInputs(), nn->getNumOutputs() );
   if ( !dataReader.ReadData() )
     {
       return 1;
@@ -94,20 +138,6 @@ int main( int argc, char* argv[] )
         << " inputs loaded" << std::endl;
     }
 
-  // Select activation function
-  //
-  BPN::ActivationFunction* sigma = new BPN::Sigmoid();
-  //BPN::ActivationFunction* sigma = new BPN::Sigmoid(2.0);
-  //BPN::ActivationFunction* sigma = new BPN::ReLU();
-
-  // Create neural network
-
-  //BPN::Network::Settings networkSettings{ numInputs, numHidden, numOutputs };
-  BPN::Network nn( layerSizes, sigma );
-  if (verbosity >= 2)
-    {
-      std::cout << nn << std::endl;
-    }
 
   // Create neural network trainer
   BPN::NetworkTrainer::Settings trainerSettings;
@@ -118,14 +148,19 @@ int main( int argc, char* argv[] )
   trainerSettings.m_desiredAccuracy = accuracy;
   trainerSettings.m_verbosity = verbosity;
 
-  BPN::NetworkTrainer trainer( trainerSettings, &nn );
+  BPN::NetworkTrainer trainer( trainerSettings, nn );
   trainer.Train( dataReader.getTrainingData() );
   if ( verbosity >= 2) 
     {
-      std::cout << nn << std::endl;
+      std::cout << *nn << std::endl;
     }
 
-  std::cout << nn.serialize() << std::endl;
+  if ( expotFile.compare("") != 0 )
+    {
+      //TODO manage export file
+      std::cout << nn->serialize() << std::endl;
+    }
+  delete nn;
 
 
   return 0;

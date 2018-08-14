@@ -194,6 +194,7 @@ namespace BPN
       is >> s;
       if ( s.compare( "layerSizes" ) != 0 )
         {
+          std::cerr << ">>" << s << "<<" << std::endl;
           throw std::runtime_error("Invalid BPN serialization");
         }
       is >> m_layerSizes;
@@ -201,6 +202,7 @@ namespace BPN
       is >> s;
       if ( s.compare( "activation" ) != 0 )
         {
+          std::cerr << ">>" << s << "<<" << std::endl;
           throw std::runtime_error("Invalid BPN serialization");
         }
       is >> s;
@@ -217,9 +219,10 @@ namespace BPN
       is >> s;
       if ( s.compare( "weights" ) != 0 )
         {
+          std::cerr << ">>" << s << "<<" << std::endl;
           throw std::runtime_error("Invalid BPN serialization");
         }
-      for( int32_t i=0; i<m_numLayers; ++i )
+      for( int32_t i=0; i<m_numLayers-1; ++i )
         {
           for (int32_t actualIdx = 0; actualIdx <= m_layerSizes[i]; ++actualIdx)
             {
@@ -227,7 +230,6 @@ namespace BPN
                 {
                   double d;
                   is >> d;
-                  std::cout << "i=" << i << ", actualIdx=" << actualIdx << ", nextIdx=" << nextIdx << ", d=" << d << std::endl;
                   m_weightsByLayer[i](actualIdx, nextIdx) = d;
                 }
             }
@@ -240,7 +242,7 @@ namespace BPN
       ss << "layerSizes "      << m_layerSizes << '\n';
       ss << "activation "      << m_sigma->serialize() << '\n';
       ss << "weights";
-      for( int32_t i=0; i<m_numLayers; ++i )
+      for( int32_t i=0; i<m_numLayers-1; ++i )
         {
           for (int32_t actualIdx = 0; actualIdx <= m_layerSizes[i]; ++actualIdx)
             {
