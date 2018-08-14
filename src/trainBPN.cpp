@@ -12,7 +12,7 @@
 #include "NeuralNetworkTrainer.h"
 #include "TrainingDataReader.h"
 #include "Matrix.h"
-#include "displayUtils.h"
+#include "vectorstream.h"
 
 #if _MSC_VER
 #pragma warning(push, 0)
@@ -25,10 +25,21 @@
 #pragma warning(pop)
 #endif
 
+// Operators from "vectorstream.h"
+using BPN::operator<<;
+using BPN::operator>>;
+
 //-------------------------------------------------------------------------
 
 int main( int argc, char* argv[] )
 {
+
+  //BPN::Network nin( std::cin );
+  //std::cout << nin << std::endl;
+  //exit(0);
+
+
+
   cli::Parser cmdParser( argc, argv );
   cmdParser.set_required<std::string>( "d", "dataFile", "Path to training data csv file." );
   cmdParser.set_required<uint32_t>( "in", "numInputs", "Num Input neurons." );
@@ -60,15 +71,16 @@ int main( int argc, char* argv[] )
 
   // Read layers sizes. The first layer is the input layer, the last layer
   // is the output. All other layers are hidden.
+  std::vector<int> hiddenLayersSizes;
+  std::stringstream ss(numsHiddens);
+  ss >> hiddenLayersSizes;
+
   std::vector<int> layerSizes;
   layerSizes.push_back(numInputs);
-  std::stringstream ss(numsHiddens);
-  std::string token;
-  while (std::getline(ss, token, ','))
-    {
-      layerSizes.push_back(atoi(token.c_str()));
-    }
+  layerSizes.insert( layerSizes.end(), hiddenLayersSizes.begin(), hiddenLayersSizes.end() );
   layerSizes.push_back(numOutputs);
+
+
 
   BPN::TrainingDataReader dataReader( trainingDataPath, numInputs, numOutputs );
   if ( !dataReader.ReadData() )
@@ -112,6 +124,9 @@ int main( int argc, char* argv[] )
     {
       std::cout << nn << std::endl;
     }
+
+  std::cout << nn.serialize() << std::endl;
+
 
   return 0;
 }

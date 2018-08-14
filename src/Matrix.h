@@ -36,11 +36,11 @@ namespace BPN
       {
         if (nRows == 0 || nCols == 0)
           {
-            throw "Matrix constructor has 0 size";
+            throw std::runtime_error("Matrix constructor has 0 size");
           }
         if (m != NULL)
           {
-            throw "Can't init a matrix that already has been initialized";
+            throw std::runtime_error("Can't init a matrix that already has been initialized");
           }
         this->nRows = nRows;
         this->nCols = nCols;
@@ -67,7 +67,7 @@ namespace BPN
       {
         if (r < 0 || r >= nRows || c < 0 || c >= nCols)
           {
-            throw "Matrix subscript out of bounds";
+            throw std::runtime_error("Matrix subscript out of bounds");
           }
         return m[coordsToIndex(r, c)];
       }
@@ -76,7 +76,7 @@ namespace BPN
       {
         if (r < 0 || r >= nRows || c < 0 || c >= nCols)
           {
-            throw "Matrix subscript out of bounds";
+            throw std::runtime_error("Matrix subscript out of bounds");
           }
         return m[coordsToIndex(r, c)];
       }

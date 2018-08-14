@@ -7,12 +7,13 @@
 // A simple neural network supporting only a single hidden layer
 
 #pragma once
-#include "ActivationFunctions.h"
 #include <stdint.h>
 #include <iostream>
 #include <vector>
 #include "SafeVector.h"
 #include "Matrix.h"
+#include "ActivationFunctions.h"
+#include "vectorstream.h"
 
 //-------------------------------------------------------------------------
 
@@ -22,6 +23,7 @@ namespace BPN
   //-------------------------------------------------------------------------
   struct Neuron
     {
+      Neuron() : activation(0.0), value(0.0) {} // empty constructor
       Neuron(double a, double v) : activation(a), value(v) 
       {}
       double activation; 
@@ -44,16 +46,17 @@ namespace BPN
 
   public:
 
-      Network(const std::vector<int>& layerSizes, const ActivationFunction* sigma);
-      Network( const char* filename);
+      Network( const std::vector<int>& layerSizes, const ActivationFunction* sigma );
+      Network( std::istream& is );
 
       std::vector<int32_t> const& Evaluate( std::vector<double> const& input );
 
       void saveToFile(const char* filename) const;
 
+      std::string serialize() const;
+      void deserialize(std::istream& is);
   private:
       void loadFromFile(const char* filename);
-      std::string serialize() const;
       void InitializeNetwork();
       void InitializeWeights();
 

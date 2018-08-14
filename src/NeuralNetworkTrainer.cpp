@@ -6,7 +6,6 @@
 //-------------------------------------------------------------------------
 
 #include "NeuralNetworkTrainer.h"
-#include "displayUtils.h"
 #include <string.h>
 #include <assert.h>
 #include <iostream>

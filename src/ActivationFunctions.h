@@ -1,13 +1,19 @@
 //-------------------------------------------------------------------------
 // Simple back-propagation neural network example
-// 2017 - Bobby Anguelov
 // 2018 - Xavier Provençal
 // MIT license: https://opensource.org/licenses/MIT
 //-------------------------------------------------------------------------
-//
+
+
 #pragma once
 
 #include <cmath>
+#include <stdlib.h>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <iomanip>
+#include <limits>
 
 
 namespace BPN
@@ -16,6 +22,9 @@ namespace BPN
     {
         Sigmoid, ReLU
     };
+
+    class Sigmoid;
+    class ReLU;
 
     class ActivationFunction 
       {
@@ -42,6 +51,13 @@ namespace BPN
             (void) fx;
             return 0.0;
           }
+
+        virtual std::string serialize() const
+          {
+            return NULL;
+          }
+
+        static ActivationFunction* deserialize(const std::string& s);
       };
 
     class Sigmoid : public ActivationFunction 
@@ -71,6 +87,16 @@ namespace BPN
             (void) x; // avoid compilation warning for unused variable
             return lambda * fx * (1.0-fx);
           }
+
+        inline std::string serialize() const
+          {
+            std::stringstream ss;
+            ss << "Sigmoid(" 
+              << std::setprecision(std::numeric_limits<long double>::digits10 + 1)
+              << lambda << ")";
+            return ss.str();
+          }
+
         const double lambda;
       };
 
@@ -98,5 +124,13 @@ namespace BPN
             (void) x; (void) fx;
             return (x > 0) ? -1 : 0;
           }
+
+        inline std::string serialize() const
+          {
+            return "ReLU";
+          }
       };
+
+
 }
+

@@ -16,8 +16,7 @@ public:
           }
         else
           {
-            std::cerr << "\nOut of bound, n=" << n << ", size=" << this->size() << std::endl;
-            std::cout << *((int*) NULL) << std::endl;
+            throw std::runtime_error("Vector index out of bound");
           }
       }
 
@@ -30,8 +29,7 @@ public:
           }
         else
           {
-            std::cerr << "\nOut of bound, n=" << n << ", size=" << this->size() << std::endl;
-            std::cout << *((int*) NULL) << std::endl;
+            throw std::runtime_error("Vector index out of bound");
           }
       }
 

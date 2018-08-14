@@ -11,7 +11,7 @@
 # A single bit in input, same bit in output (for debugging)
 # num input : 1
 # num output : 1
-./trainBPN -d ../Example/bit -in 1 -hidden 1 -out 1
+./trainBPN -d ../Example/bit -in 1 -hidden 2,3,2 -out 1
 
 # 30x30 binary images to classify in three categories : 
 # 1,0,0 --> straight line

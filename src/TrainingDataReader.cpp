@@ -85,8 +85,7 @@ namespace BPN
         }
         else
         {
-            std::cerr << "Error Opening Input File: " << m_filename << std::endl;
-            return false;
+            throw std::runtime_error("Error opening input file");
         }
     }
 

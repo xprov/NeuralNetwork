@@ -5,8 +5,6 @@
 // MIT license: https://opensource.org/licenses/MIT
 //-------------------------------------------------------------------------
 
-#include "NeuralNetwork.h"
-#include "displayUtils.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,6 +13,8 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+
+#include "NeuralNetwork.h"
 
 //-------------------------------------------------------------------------
 
@@ -25,18 +25,18 @@ namespace BPN
       , m_sigma(sigma)
     {
       assert(layerSizes.size() >= 3);
-      m_numLayers = layerSizes.size();
-      m_numInputs = layerSizes[0];
-      m_numOutputs = layerSizes[m_numLayers-1];
-      m_numOnLastHidden = layerSizes[m_numLayers-2];
+      m_numLayers       = m_layerSizes.size();
+      m_numInputs       = m_layerSizes[0];
+      m_numOutputs      = m_layerSizes[m_numLayers-1];
+      m_numOnLastHidden = m_layerSizes[m_numLayers-2];
       InitializeNetwork();
       InitializeWeights();
     }
 
 
-  Network::Network(const char* filename)
+  Network::Network( std::istream& is )
     {
-      loadFromFile(filename);
+      deserialize( is );
     }
 
 
@@ -136,6 +136,7 @@ namespace BPN
               for ( int32_t prevIdx = 0; prevIdx <= m_layerSizes[i-1]; ++prevIdx )
                 {
                   activation += m_neurons[i-1][prevIdx].value * m_weightsByLayer[i-1](prevIdx, actualIdx);
+                  //std::cout << "layer=" << i << ", actualIdx" << actualIdx << ", prevIdx=" << prevIdx << ", activation = " << m_neurons[i-1][prevIdx].value << " * " << m_weightsByLayer[i-1](prevIdx, actualIdx) << std::endl;
                 }
 
               // Apply activation function
@@ -156,34 +157,103 @@ namespace BPN
 
   std::string Network::selfDisplay() const
     {
-      std::stringstream ss;
+      std::ostringstream ss;
       ss << "+----------------------------------------------------+\n"
          << "| Number of input  nodes: " << m_numInputs << '\n'
-         << "| Number of hidden nodes: " << DisplayUtils::vectorToString(m_layerSizes) << '\n'
-         << "| Number of output nodes: " << m_numOutputs << "\n| \n"
-         << "| Input  (line)(last is bias) -> Hidden #1 (column) weights:\n\n"
+         << "| Number of output nodes: " << m_numOutputs << "\n"
+         << "| Layer sizes (first in input, last is output) : " << m_layerSizes << '\n'
+         << "|\n"
+         << "| Weights : Input  (line)(last is bias) to Hidden #1 (column)\n"
          << m_weightsByLayer[0]
-         << "\n|\n";
+         << "|\n";
       for (int32_t i=1; i<m_numLayers-2; ++i) 
         {
-          ss << "| Hidden #" << i << " (line)(last is bias) to Hidden #" << i+1 << " (column) weights:\n\n" 
+          ss << "| Weights : Hidden #" << i << " (line)(last is bias) to Hidden #" << i+1 << " (column)\n" 
              << m_weightsByLayer[i]
-             << "\n|\n";
+             << "|\n";
         }
-      ss << "| Hidden #" << m_numLayers-2 << " (line)(last is bias) -> Output (column) weights:\n\n"
+      ss << "| Weights : Hidden #" << m_numLayers-2 << " (line)(last is bias) to Output (column)\n"
          << m_weightsByLayer[m_numLayers-2]
-         << "\n|\n"
-         << "| Input  neurons    : " << DisplayUtils::vectorToString(*m_inputNeurons) << "\n"
-         //<< "| Hidden neurons    : " << DisplayUtils::vectorToString(*m_hiddenNeurons) << "\n"
-         << "| Output neurons    : " << DisplayUtils::vectorToString(*m_outputNeurons) << "\n"
-         << "| Clamp o/p neurons : " << DisplayUtils::vectorToString(m_clampedOutputs) << "\n"
+         << "|\n"
+         << "| --- Neurons ---\n"
+         << "|\n"
+         << "| Input layer       : " << *m_inputNeurons << "\n";
+         for ( int32_t i=1; i<m_numLayers-1; ++i )
+           {
+             ss << "| Hidden layer #" << i << "   : " << m_neurons[i] << "\n";
+           }
+      ss << "| Output neurons    : " << *m_outputNeurons << "\n"
+         << "| Clamp o/p neurons : " << m_clampedOutputs << "\n"
          << "+----------------------------------------------------+\n";
       return ss.str();
     }
 
+  void Network::deserialize(std::istream& is)
+    {
+      std::string s;
+      is >> s;
+      if ( s.compare( "layerSizes" ) != 0 )
+        {
+          throw std::runtime_error("Invalid BPN serialization");
+        }
+      is >> m_layerSizes;
+
+      is >> s;
+      if ( s.compare( "activation" ) != 0 )
+        {
+          throw std::runtime_error("Invalid BPN serialization");
+        }
+      is >> s;
+      m_sigma           = ActivationFunction::deserialize(s);
+
+      m_numLayers       = m_layerSizes.size();
+      m_numInputs       = m_layerSizes[0];
+      m_numOutputs      = m_layerSizes[m_numLayers-1];
+      m_numOnLastHidden = m_layerSizes[m_numLayers-2];
+
+      InitializeNetwork();
+
+      // Read weights
+      is >> s;
+      if ( s.compare( "weights" ) != 0 )
+        {
+          throw std::runtime_error("Invalid BPN serialization");
+        }
+      for( int32_t i=0; i<m_numLayers; ++i )
+        {
+          for (int32_t actualIdx = 0; actualIdx <= m_layerSizes[i]; ++actualIdx)
+            {
+              for (int32_t nextIdx = 0; nextIdx < m_layerSizes[i+1]; ++nextIdx)
+                {
+                  double d;
+                  is >> d;
+                  std::cout << "i=" << i << ", actualIdx=" << actualIdx << ", nextIdx=" << nextIdx << ", d=" << d << std::endl;
+                  m_weightsByLayer[i](actualIdx, nextIdx) = d;
+                }
+            }
+        }
+    }
+
   std::string Network::serialize() const
     {
+      std::stringstream ss;
+      ss << "layerSizes "      << m_layerSizes << '\n';
+      ss << "activation "      << m_sigma->serialize() << '\n';
+      ss << "weights";
+      for( int32_t i=0; i<m_numLayers; ++i )
+        {
+          for (int32_t actualIdx = 0; actualIdx <= m_layerSizes[i]; ++actualIdx)
+            {
+              for (int32_t nextIdx = 0; nextIdx < m_layerSizes[i+1]; ++nextIdx)
+                {
+                  ss << ' ' << m_weightsByLayer[i](actualIdx, nextIdx);
+                }
+            }
+        }
+      return ss.str();
     }
+
+  
 
   void Network::saveToFile(const char* filename) const
     {
