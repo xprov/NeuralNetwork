@@ -50,7 +50,7 @@ int main( int argc, char* argv[] )
   cmdParser.set_optional<double>( "mom", "momentum", 0.9, "Multiplicative coefficient applied on previous error delta when non using batch learning." );
   cmdParser.set_optional<bool>( "b", "batchLearning", false, "Use batch learning (1 : yes, 0 : no)." );
   cmdParser.set_optional<double>( "a", "accuracy", 95, "Desired accuracy. Training stops when the desired accuracy is obtained." );
-  cmdParser.set_optional<int32_t>( "v", "verbose", 1, "Verbosity level. Level 0, quiet mode. Level 1, prints training evolution, 2 : prints BPN at initialization and at the end. Level 3 : prints BPN at every iteration of the learning phase." );
+  cmdParser.set_optional<int32_t>( "v", "verbose", 1, "Verbosity level.\n     Level 0: quiet mode.\n     Level 1: prints training evolution.\n     Level 2: prints NN at initialization and at the end.\n     Level 3: prints NN at every iteration of the learning phase." );
 
   if ( !cmdParser.run() )
     {

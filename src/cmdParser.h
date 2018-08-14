@@ -264,7 +264,7 @@ namespace cli {
                 args.output << this->usage();
                 exit( 0 );
                 return false;
-            } ), "", true );
+            } ), "Show this help.", true );
         }
 
         void disable_help() {
@@ -476,7 +476,7 @@ namespace cli {
 
                 ss << "\n   " << command->description;
 
-                if ( command->required == false )
+                if ( command->required == false && !command->is("-h") )
                 {
                     ss << "\n   " << "This parameter is optional. The default value is '" + command->print_value() << "'.";
                 }
