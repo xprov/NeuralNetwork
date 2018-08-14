@@ -84,20 +84,10 @@ namespace BPN
         uint32_t                          m_maxEpochs;            // Max number of training epochs
         bool                              m_useBatchLearning;     // Should we use batch learning
 
-        // Training data
-        //SafeVector<double>                m_deltaInputHidden;     // Delta for input hidden layer
-        //SafeVector<double>                m_deltaHiddenOutput;    // Delta for hidden output layer
-        
         // m_deltas[i] : deltas from layer i to i+1
         std::vector<Matrix>               m_deltas;
         // m_errorGradients[i] error gradients on layer i
         std::vector< SafeVector<double> > m_errorGradients;
-
-        //Matrix*                           m_deltaInputHidden;     // Delta for (input) -> (hidden) layer
-        //Matrix*                           m_deltaHiddenOutput;    // Delta for (hidden) -> (output) layer
-        //SafeVector<double>*               m_errorGradientsHidden; // Error gradients for the hidden layer
-        //SafeVector<double>*               m_errorGradientsOutput; // Error gradients for the outputs
-
 
         uint32_t                          m_currentEpoch;             // Epoch counter
         double                            m_trainingSetAccuracy;

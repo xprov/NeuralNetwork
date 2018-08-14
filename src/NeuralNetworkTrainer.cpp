@@ -53,11 +53,6 @@ namespace BPN
             m_errorGradients[i].resize( layerSize, 0.0 );
           }
 
-        // to remove
-        //m_deltaInputHidden = &m_deltas[0];
-        //m_deltaHiddenOutput = &m_deltas[1];
-        //m_errorGradientsHidden = &m_errorGradients[1];
-        //m_errorGradientsOutput = &m_errorGradients[2];
     }
 
     void NetworkTrainer::Train( TrainingData const& trainingData )
@@ -130,7 +125,6 @@ namespace BPN
         int32_t numOnNextLayer   = m_pNetwork->m_layerSizes[layer+1];
         for ( auto nextLayerIdx=0; nextLayerIdx < numOnNextLayer; ++nextLayerIdx )
           {
-            //int32_t const weightIdx = m_pNetwork->GetHiddenOutputWeightIndex( hiddenIdx, outputIdx );
             weightedSum += m_pNetwork->m_weightsByLayer[layer](index, nextLayerIdx) 
               * m_errorGradients[layer+1][nextLayerIdx];
           }
@@ -139,28 +133,7 @@ namespace BPN
         const Neuron& n = m_pNetwork->m_neurons[layer][index];
         double derivative = m_pNetwork->m_sigma->evalDerivative( n.activation, n.value );
         return derivative * weightedSum;
-        //return m_pNetwork->m_hiddenNeurons[hiddenIdx].value
-        //  * ( 1.0 - m_pNetwork->m_hiddenNeurons[hiddenIdx].value ) * weightedSum;
       }
-
-    //double NetworkTrainer::GetHiddenErrorGradient( int32_t hiddenIdx ) const
-    //{
-    //    // Get sum of hidden->output weights * output error gradients
-    //    double weightedSum = 0;
-    //    for ( auto outputIdx = 0; outputIdx < m_pNetwork->m_numOutputs; outputIdx++ )
-    //    {
-    //        //int32_t const weightIdx = m_pNetwork->GetHiddenOutputWeightIndex( hiddenIdx, outputIdx );
-    //        weightedSum += m_pNetwork->m_weightsByLayer[m_pNetwork->m_numLayers-2](hiddenIdx, outputIdx) 
-    //                       * (*m_errorGradientsOutput)[outputIdx];
-    //    }
-    //    
-    //    // Return error gradient
-    //    const Neuron& n = (*m_pNetwork->m_hiddenNeurons)[hiddenIdx];
-    //    double derivative = m_pNetwork->m_sigma->evalDerivative( n.activation, n.value );
-    //    return derivative * weightedSum;
-    //    //return m_pNetwork->m_hiddenNeurons[hiddenIdx].value
-    //    //  * ( 1.0 - m_pNetwork->m_hiddenNeurons[hiddenIdx].value ) * weightedSum;
-    //}
 
     void NetworkTrainer::RunEpoch( TrainingSet const& trainingSet )
     {
@@ -203,14 +176,12 @@ namespace BPN
         // Update training accuracy and MSE
         m_trainingSetAccuracy = 100.0 - ( incorrectEntries / trainingSet.size() * 100.0 );
         m_trainingSetMSE = MSE / ( m_pNetwork->m_numOutputs * trainingSet.size() );
-
-       // std::cout << *m_pNetwork << std::endl;
     }
 
     void NetworkTrainer::Backpropagate( std::vector<int32_t> const& expectedOutputs )
       {
         // Modify deltas between the last hidden layer and output layers
-        //--------------------------------------------------------------------------------------------------------
+        //---------------------------------------------------------------------
         int32_t numLayers = m_pNetwork->m_numLayers;
         BPN::Network::Layer& lastHiddenNeurons = *m_pNetwork->m_lastHiddenNeurons;
         BPN::Network::Layer& outputNeurons = *m_pNetwork->m_outputNeurons;
@@ -225,8 +196,6 @@ namespace BPN
             // For all nodes in the last hidden layer and bias neuron
             for ( auto hiddenIdx = 0; hiddenIdx <= m_pNetwork->m_numOnLastHidden; ++hiddenIdx )
               {
-                //int32_t const weightIdx = m_pNetwork->GetHiddenOutputWeightIndex( hiddenIdx, outputIdx );
-
                 // Calculate change in weight
                 if ( m_useBatchLearning )
                   {
@@ -234,10 +203,6 @@ namespace BPN
                       m_learningRate 
                       * lastHiddenNeurons[hiddenIdx].value 
                       * m_errorGradients[numLayers-1][outputIdx];
-                    //(*m_deltaHiddenOutput)(hiddenIdx, outputIdx) += 
-                    //  m_learningRate 
-                    //  * lastHiddenNeurons[hiddenIdx].value 
-                    //  * (*m_errorGradientsOutput)[outputIdx];
                   }
                 else
                   {
@@ -246,16 +211,12 @@ namespace BPN
                       * lastHiddenNeurons[hiddenIdx].value 
                       * m_errorGradients[numLayers-1][outputIdx] 
                       + m_momentum * m_deltas[numLayers-2](hiddenIdx, outputIdx);
-                    //(*m_deltaHiddenOutput)(hiddenIdx, outputIdx) = 
-                    //  m_learningRate * lastHiddenNeurons[hiddenIdx].value 
-                    //  * (*m_errorGradientsOutput)[outputIdx] 
-                    //  + m_momentum * (*m_deltaHiddenOutput)(hiddenIdx, outputIdx);
                   }
               }
           }
 
-        //// //// Modify deltas between all other layers
-        //// ////--------------------------------------------------------------------------------------------------------
+        //// Modify deltas between all other layers
+        ////--------------------------------------------------------------------
         // deltas[numLaters-2] have been computed, lets compute all others.
         for ( int32_t layer = numLayers-3; layer >= 0; --layer )
           {
@@ -265,8 +226,6 @@ namespace BPN
               {
                 // Get error gradient for every hidden node
                 m_errorGradients[layer+1][nextIdx] = getErrorGradient( layer+1, nextIdx );
-                //(*m_errorGradientsHidden)[hiddenIdx] = getErrorGradient( numLayers-2, hiddenIdx );
-                //(*m_errorGradientsHidden)[hiddenIdx] = GetHiddenErrorGradient( hiddenIdx );
 
                 // For all nodes in actual layer and bias neuron
                 for ( auto actualIdx = 0; actualIdx <= m_pNetwork->m_layerSizes[layer]; actualIdx++ )
@@ -278,11 +237,6 @@ namespace BPN
                           m_learningRate 
                           * m_pNetwork->m_neurons[layer][actualIdx].value 
                           * m_errorGradients[layer+1][nextIdx];
-
-                        //(*m_deltaInputHidden)(inputIdx, hiddenIdx) += 
-                        //  m_learningRate 
-                        //  * inputNeurons[inputIdx].value 
-                        //  * (*m_errorGradientsHidden)[hiddenIdx];
                       }
                     else
                       {
@@ -291,58 +245,17 @@ namespace BPN
                           * m_pNetwork->m_neurons[layer][actualIdx].value
                           * m_errorGradients[layer+1][nextIdx]
                           + m_momentum * m_deltas[layer](actualIdx, nextIdx);
-                        //(*m_deltaInputHidden)(inputIdx, hiddenIdx) = 
-                        //  m_learningRate 
-                        //  * inputNeurons[inputIdx].value 
-                        //  * (*m_errorGradientsHidden)[hiddenIdx] 
-                        //  + m_momentum * (*m_deltaInputHidden)(inputIdx, hiddenIdx);
                       }
                   }
               }
 
           }
 
-        //for ( auto hiddenIdx = 0; hiddenIdx < m_pNetwork->m_numOnLastHidden; hiddenIdx++ )
-        //  {
-        //    // Get error gradient for every hidden node
-        //    //(*m_errorGradientsHidden)[hiddenIdx] = GetHiddenErrorGradient( hiddenIdx );
-        //    (*m_errorGradientsHidden)[hiddenIdx] = getErrorGradient( numLayers-2, hiddenIdx );
-
-        //    // For all nodes in input layer and bias neuron
-        //    for ( auto inputIdx = 0; inputIdx <= m_pNetwork->m_numInputs; inputIdx++ )
-        //      {
-        //        //int32_t const weightIdx = m_pNetwork->GetInputHiddenWeightIndex( inputIdx, hiddenIdx );
-
-        //        // Calculate change in weight 
-        //        if ( m_useBatchLearning )
-        //          {
-        //            (*m_deltaInputHidden)(inputIdx, hiddenIdx) += 
-        //              m_learningRate * inputNeurons[inputIdx].value * (*m_errorGradientsHidden)[hiddenIdx];
-        //          }
-        //        else
-        //          {
-        //            (*m_deltaInputHidden)(inputIdx, hiddenIdx) = 
-        //              m_learningRate * inputNeurons[inputIdx].value * (*m_errorGradientsHidden)[hiddenIdx] 
-        //              + m_momentum * (*m_deltaInputHidden)(inputIdx, hiddenIdx);
-        //          }
-        //      }
-        //  }
-
-
-
         // If using stochastic learning update the weights immediately
         if ( !m_useBatchLearning )
           {
             UpdateWeights();
           }
-        //std::cout << "################################################################\n";
-        //std::cout << m_deltas[0] << std::endl;
-        //std::cout << "\n";
-        //std::cout << m_deltas[1] << std::endl;
-        //std::cout << "--------------------------------------------------\n";
-        //std::cout << "errG hid : " << DisplayUtils::vectorToString(m_errorGradients[1]) << std::endl;
-        //std::cout << "errG out : " << DisplayUtils::vectorToString(m_errorGradients[2]) << std::endl;
-        //std::cout << "################################################################\n";
 
       }
 
@@ -367,41 +280,6 @@ namespace BPN
             }
 
         }
-        //// Input -> hidden weights
-        ////--------------------------------------------------------------------------------------------------------
-
-        //for ( auto inputIdx = 0; inputIdx <= m_pNetwork->m_numInputs; inputIdx++ )
-        //{
-        //    for ( auto hiddenIdx = 0; hiddenIdx < m_pNetwork->m_numOnLastHidden; hiddenIdx++ )
-        //    {
-        //        //int32_t const weightIdx = m_pNetwork->GetInputHiddenWeightIndex( inputIdx, hiddenIdx );
-        //        m_pNetwork->m_weightsByLayer[0](inputIdx, hiddenIdx) += (*m_deltaInputHidden)(inputIdx, hiddenIdx);
-
-        //        // Clear delta only if using batch (previous delta is needed for momentum
-        //        if ( m_useBatchLearning )
-        //        {
-        //            (*m_deltaInputHidden)(inputIdx, hiddenIdx) = 0;
-        //        }
-        //    }
-        //}
-
-        //// Hidden -> output weights
-        ////--------------------------------------------------------------------------------------------------------
-
-        //for ( auto hiddenIdx = 0; hiddenIdx <= m_pNetwork->m_numOnLastHidden; hiddenIdx++ )
-        //{
-        //    for ( auto outputIdx = 0; outputIdx < m_pNetwork->m_numOutputs; outputIdx++ )
-        //    {
-        //        //int32_t const weightIdx = m_pNetwork->GetHiddenOutputWeightIndex( hiddenIdx, outputIdx );
-        //        m_pNetwork->m_weightsByLayer[m_pNetwork->m_numLayers-2](hiddenIdx, outputIdx) += (*m_deltaHiddenOutput)(hiddenIdx, outputIdx);
-
-        //        // Clear delta only if using batch (previous delta is needed for momentum)
-        //        if ( m_useBatchLearning )
-        //        {
-        //            (*m_deltaInputHidden)(hiddenIdx, outputIdx) = 0;
-        //        }
-        //    }
-        //}
     }
 
     void NetworkTrainer::GetSetAccuracyAndMSE( TrainingSet const& trainingSet, double& accuracy, double& MSE ) const

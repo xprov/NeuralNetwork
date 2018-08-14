@@ -49,26 +49,10 @@ namespace BPN
 
   public:
 
-      //struct Settings
-      //  {
-      //    uint32_t                        m_numInputs;
-      //    uint32_t                        m_numHidden;
-      //    uint32_t                        m_numOutputs;
-      //  };
-
-  public:
-
       Network(const std::vector<int>& layerSizes, const ActivationFunction* sigma);
-      //Network( Settings const& settings, const ActivationFunction* sigma );
-      //Network( Settings const& settings, std::vector<double> const& weights, const ActivationFunction* sigma );
       Network( const char* filename);
 
       std::vector<int32_t> const& Evaluate( std::vector<double> const& input );
-
-      //std::vector<double> const& GetInputHiddenWeights() const { return m_weightsInputHidden; }
-      //std::vector<double> const& GetHiddenOutputWeights() const { return m_weightsHiddenOutput; }
-      //Matrix const& GetInputHiddenWeights() const { return *m_weightsInputHidden; }
-      //Matrix const& GetHiddenOutputWeights() const { return *m_weightsHiddenOutput; }
 
       void saveToFile(const char* filename) const;
 
@@ -77,17 +61,6 @@ namespace BPN
       std::string serialize() const;
       void InitializeNetwork();
       void InitializeWeights();
-      //void LoadWeights( std::vector<double> const& weights );
-
-      //int32_t GetInputHiddenWeightIndex( int32_t inputIdx, int32_t hiddenIdx ) const 
-      //  { 
-      //    return inputIdx * m_numHidden + hiddenIdx; 
-      //  }
-      //int32_t GetHiddenOutputWeightIndex( int32_t hiddenIdx, int32_t outputIdx ) const 
-      //  { 
-      //    return hiddenIdx * m_numOutputs + outputIdx; 
-      //  }
-
 
   private:
 
@@ -98,7 +71,6 @@ namespace BPN
       std::vector<int>            m_layerSizes;
 
 
-      //typedef std::vector<Neuron> Layer;
       typedef std::vector<Neuron> Layer;
       std::vector<Layer>          m_neurons;
       Layer*                      m_inputNeurons;
@@ -109,9 +81,6 @@ namespace BPN
 
       // m_wrigntsByLayer[i] is the matrix of weights from layer i to layer i+1
       std::vector<Matrix>         m_weightsByLayer;
-
-      //Matrix*         m_weightsInputHidden;
-      //Matrix*         m_weightsHiddenOutput;
 
       const ActivationFunction*   m_sigma;
 
