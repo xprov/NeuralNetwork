@@ -17,17 +17,17 @@ It is intended as a reference/example implementation and will not be maintained 
 
 # Compilation
 ```
-$ mkdir build
-$ cd build
-$ cmake ..
-$ make
+mkdir build
+cd build
+cmake ..
+make
 ```
 
 Alternatively, since one might find useful to use debug/release versions:
 ```
-$ mkdir debug && cd debug && cmake -DCMAKE_BUILD_TYPE=Debug .. && make -j
-$ cd ..
-$ mkdir release && cd release && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j
+mkdir debug && cd debug && cmake -DCMAKE_BUILD_TYPE=Debug .. && make -j
+cd ..
+mkdir release && cd release && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j
 ```
 
 
