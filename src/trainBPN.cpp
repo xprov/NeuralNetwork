@@ -39,6 +39,7 @@ int main( int argc, char* argv[] )
   cmdParser.set_optional<double>( "mom", "momentum", 0.9, "Multiplicative coefficient applied on previous error delta when non using batch learning." );
   cmdParser.set_optional<bool>( "b", "batchLearning", false, "Use batch learning (1 : yes, 0 : no)." );
   cmdParser.set_optional<double>( "a", "accuracy", 95, "Desired accuracy. Training stops when the desired accuracy is obtained." );
+  cmdParser.set_optional<int32_t>( "v", "verbose", 1, "Verbosity level. Level 0, quiet mode. Level 1, prints training evolution, 2 : prints BPN at initialization and at the end. Level 3 : prints BPN at every iteration of the learning phase." );
 
   if ( !cmdParser.run() )
     {
@@ -55,6 +56,7 @@ int main( int argc, char* argv[] )
   double            momentum          = cmdParser.get<double>( "mom" );
   bool              batchLearning     = cmdParser.get<bool>( "b" );
   double            accuracy          = cmdParser.get<double>( "a" );
+  int32_t           verbosity         = cmdParser.get<int32_t>( "v" );
 
   // Read layers sizes. The first layer is the input layer, the last layer
   // is the output. All other layers are hidden.
@@ -73,7 +75,12 @@ int main( int argc, char* argv[] )
     {
       return 1;
     }
-  std::cout << DisplayUtils::vectorToString(layerSizes) << std::endl;
+  if ( verbosity >= 1 )
+    {
+      std::cout << "Input file: " << trainingDataPath
+        << "\nRead complete: " << dataReader.getNumEnties()
+        << " inputs loaded" << std::endl;
+    }
 
   // Select activation function
   //
@@ -85,7 +92,10 @@ int main( int argc, char* argv[] )
 
   //BPN::Network::Settings networkSettings{ numInputs, numHidden, numOutputs };
   BPN::Network nn( layerSizes, sigma );
-  std::cout << nn << std::endl;
+  if (verbosity >= 2)
+    {
+      std::cout << nn << std::endl;
+    }
 
   // Create neural network trainer
   BPN::NetworkTrainer::Settings trainerSettings;
@@ -94,11 +104,14 @@ int main( int argc, char* argv[] )
   trainerSettings.m_useBatchLearning = batchLearning;
   trainerSettings.m_maxEpochs = maxEpoch;
   trainerSettings.m_desiredAccuracy = accuracy;
+  trainerSettings.m_verbosity = verbosity;
 
   BPN::NetworkTrainer trainer( trainerSettings, &nn );
-  //std::cout << nn << std::endl;
-  trainer.Train( dataReader.GetTrainingData() );
-  std::cout << nn << std::endl;
+  trainer.Train( dataReader.getTrainingData() );
+  if ( verbosity >= 2) 
+    {
+      std::cout << nn << std::endl;
+    }
 
   return 0;
 }

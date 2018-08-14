@@ -81,12 +81,11 @@ namespace BPN
                 CreateTrainingData();
             }
 
-            std::cout << "Input file: " << m_filename << "\nRead complete: " << m_entries.size() << " inputs loaded" << std::endl;
             return true;
         }
         else
         {
-            std::cout << "Error Opening Input File: " << m_filename << std::endl;
+            std::cerr << "Error Opening Input File: " << m_filename << std::endl;
             return false;
         }
     }

@@ -17,15 +17,19 @@ namespace BPN
     {
     public:
 
-        TrainingDataReader( std::string const& filename, int32_t numInputs, int32_t numOutputs );
+        TrainingDataReader( std::string const& filename, 
+                            int32_t numInputs, 
+                            int32_t numOutputs );
+
 
         bool ReadData();
 
-        inline int32_t GetNumInputs() const { return m_numInputs; }
-        inline int32_t GetNumOutputs() const { return m_numOutputs; }
+        inline int32_t getNumInputs() const { return m_numInputs; }
+        inline int32_t getNumOutputs() const { return m_numOutputs; }
+        inline int32_t getNumEnties() const { return m_entries.size(); }
 
-        inline int32_t GetNumTrainingSets() const { return 0; }
-        TrainingData const& GetTrainingData() const { return m_data; }
+        inline int32_t getNumTrainingSets() const { return 0; }
+        TrainingData const& getTrainingData() const { return m_data; }
 
     private:
 

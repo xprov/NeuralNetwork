@@ -33,27 +33,6 @@ namespace BPN
       InitializeWeights();
     }
 
-  //Network::Network( Settings const& settings, const ActivationFunction* sigma )
-  //  : m_numInputs( settings.m_numInputs ), 
-  //    m_numHidden( settings.m_numHidden ), 
-  //    m_numOutputs( settings.m_numOutputs ), 
-  //    m_sigma(sigma)
-  //{
-  //  assert( settings.m_numInputs > 0 && settings.m_numOutputs > 0 && settings.m_numHidden > 0 );
-  //  InitializeNetwork();
-  //  InitializeWeights();
-  //}
-
-  //Network::Network( Settings const& settings, std::vector<double> const& weights, const ActivationFunction* sigma )
-  //  : m_numInputs( settings.m_numInputs )
-  //    , m_numHidden( settings.m_numHidden )
-  //    , m_numOutputs( settings.m_numOutputs )
-  //    , m_sigma( sigma )
-  //{
-  //  assert( settings.m_numInputs > 0 && settings.m_numOutputs > 0 && settings.m_numHidden > 0 );
-  //  InitializeNetwork();
-  //  //LoadWeights( weights );
-  //}
 
   Network::Network(const char* filename)
     {
@@ -118,53 +97,17 @@ namespace BPN
                 }
             }
         }
-      //for ( int32_t inputIdx = 0; inputIdx <= m_numInputs; inputIdx++ )
-      //  {
-      //    for ( int32_t hiddenIdx = 0; hiddenIdx < m_numHidden; hiddenIdx++ )
-      //      {
-      //        //int32_t const weightIdx = GetInputHiddenWeightIndex( inputIdx, hiddenIdx );
-      //        double const weight = normalDistribution( generator );
-      //        m_weightsInputHidden(inputIdx, hiddenIdx) = weight;
-      //      }
-      //  }
-
-      //// Set weights to normally distributed random values between [-2.4 / numInputs, 2.4 / numInputs]
-      //for ( int32_t hiddenIdx = 0; hiddenIdx <= m_numHidden; hiddenIdx++ )
-      //  {
-      //    for ( int32_t outputIdx = 0; outputIdx < m_numOutputs; outputIdx++ )
-      //      {
-      //        double const weight = normalDistribution( generator );
-      //        //double const weight = rand();
-      //        m_weightsHiddenOutput(hiddenIdx, outputIdx) = weight;
-      //      }
-      //  }
     }
 
-  //void Network::LoadWeights( std::vector<double> const& weights )
-  //  {
-  //    int32_t const numInputHiddenWeights = m_numInputs * m_numHidden;
-  //    int32_t const numHiddenOutputWeights = m_numHidden * m_numOutputs;
-  //    assert( weights.size() == (unsigned int) numInputHiddenWeights + numHiddenOutputWeights );
 
-  //    int32_t weightIdx = 0;
-  //    for ( auto InputHiddenIdx = 0; InputHiddenIdx < numInputHiddenWeights; InputHiddenIdx++ )
-  //      {
-  //        m_weightsInputHidden[InputHiddenIdx] = weights[weightIdx];
-  //        weightIdx++;
-  //      }
-
-  //    for ( auto HiddenOutputIdx = 0; HiddenOutputIdx < numHiddenOutputWeights; HiddenOutputIdx++ )
-  //      {
-  //        m_weightsHiddenOutput[HiddenOutputIdx] = weights[weightIdx];
-  //        weightIdx++;
-  //      }
-  //  }
-
-  // TODO GEN TO MULTIPLE LAYERS
   std::vector<int32_t> const& Network::Evaluate( std::vector<double> const& input )
     {
       assert( input.size() == (unsigned int) m_numInputs );
-      //assert( m_inputNeurons.back() == -1.0 && m_hiddenNeurons.back() == -1.0 );
+      for ( int i=0; i<m_numLayers-1; ++i )
+        {
+          assert( m_neurons[i].back().value == 1.0);
+        }
+
       // Local variables
       Layer& inputNeurons  = *m_inputNeurons;
 

@@ -35,11 +35,6 @@ namespace BPN
 
       //-------------------------------------------------------------------------
 
-      //inline static double SigmoidActivationFunction( double x )
-      //{
-      //    return 1.0 / ( 1.0 + std::exp( -x ) );
-      //}
-
       inline static int32_t ClampOutputValue( double x )
         {
           if ( x < 0.1 ) return 0;
@@ -64,18 +59,18 @@ namespace BPN
 
   private:
 
-      int32_t                     m_numLayers;
-      int32_t                     m_numInputs;
-      int32_t                     m_numOutputs;
-      int32_t                     m_numOnLastHidden; // to remove
-      std::vector<int>            m_layerSizes;
+      int32_t                     m_numLayers;       // number of layers including input and output (min 3)
+      int32_t                     m_numInputs;       // number of neurons on the input layer
+      int32_t                     m_numOutputs;      // number of neurons on the output layer
+      int32_t                     m_numOnLastHidden; // number of neurons on the last hidden layer
+      std::vector<int>            m_layerSizes;      // m_layerSizes[i] is the number of neurons on the i-th layer.
 
 
       typedef std::vector<Neuron> Layer;
-      std::vector<Layer>          m_neurons;
-      Layer*                      m_inputNeurons;
-      Layer*                      m_lastHiddenNeurons;
-      Layer*                      m_outputNeurons;
+      std::vector<Layer>          m_neurons;           // m_neurons[i] is the i-th layer
+      Layer*                      m_inputNeurons;      // &m_neurons[0]
+      Layer*                      m_lastHiddenNeurons; // &m_neurons[-2] (python notations)
+      Layer*                      m_outputNeurons;     // &m_neurons[-1]
 
       std::vector<int32_t>        m_clampedOutputs;
 

@@ -38,13 +38,16 @@ namespace BPN
         struct Settings
         {
             // Learning params
-            double      m_learningRate = 0.001;
-            double      m_momentum = 0.9;
-            bool        m_useBatchLearning = false;
+            double      m_learningRate;
+            double      m_momentum;
+            bool        m_useBatchLearning;
 
             // Stopping conditions
-            uint32_t    m_maxEpochs = 150;
-            double      m_desiredAccuracy = 90;
+            uint32_t    m_maxEpochs;
+            double      m_desiredAccuracy;
+
+            // Verbosity
+            int32_t     m_verbosity;
         };
 
     public:
@@ -96,5 +99,7 @@ namespace BPN
         double                            m_trainingSetMSE;
         double                            m_validationSetMSE;
         double                            m_generalizationSetMSE;
+        int32_t                           m_verbosity;
+
     };
 }
