@@ -1,6 +1,7 @@
 //-------------------------------------------------------------------------
 // Simple back-propagation neural network example
 // 2017 - Bobby Anguelov
+// 2018 - Xavier Provençal
 // MIT license: https://opensource.org/licenses/MIT
 //-------------------------------------------------------------------------
 
@@ -31,7 +32,7 @@ int main( int argc, char* argv[] )
   cli::Parser cmdParser( argc, argv );
   cmdParser.set_required<std::string>( "d", "dataFile", "Path to training data csv file." );
   cmdParser.set_required<uint32_t>( "in", "numInputs", "Num Input neurons." );
-  cmdParser.set_required<std::string>( "hidden", "numHidden", "List of the hidden layers sizes." );
+  cmdParser.set_required<std::string>( "hidden", "numHidden", "Comma separated list of the hidden layers sizes (e.g.: 3,2,3 or 1)." );
   cmdParser.set_required<uint32_t>( "out", "numOutputs", "Num Output neurons." );
   cmdParser.set_optional<uint32_t>( "m", "maxEpoch", 100, "Maximum num of iterations." );
   cmdParser.set_optional<double>( "l", "learningRate", 0.01, "Multiplicative coefficient on error gradient" );

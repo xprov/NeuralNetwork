@@ -1,3 +1,10 @@
+//-------------------------------------------------------------------------
+// Simple back-propagation neural network example
+// 2017 - Bobby Anguelov
+// 2018 - Xavier Provençal
+// MIT license: https://opensource.org/licenses/MIT
+//-------------------------------------------------------------------------
+//
 #include <iostream>
 #include <sstream>
 #include "Matrix.h"
