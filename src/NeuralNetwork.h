@@ -56,14 +56,29 @@ namespace BPN
       std::string serialize() const;
       void deserialize(std::istream& is);
 
-      inline int32_t getNumInputs() 
+      inline int32_t getNumInputs() const
         {
           return m_numInputs;
         }
 
-      inline int32_t getNumOutputs() 
+      inline int32_t getNumOutputs() const
         {
           return m_numInputs;
+        }
+
+      inline int32_t getNumLayers() const
+        {
+          return m_neurons.size();
+        }
+
+      inline const std::vector<int>& getLayerSizes() const
+        {
+          return m_layerSizes;
+        }
+
+      inline double getValue( int layer, int n ) const
+        {
+          return m_neurons[layer][n].value;
         }
 
   private:

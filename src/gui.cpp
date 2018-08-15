@@ -1,211 +1,268 @@
-#include <gtk/gtk.h>
-#include <gdk/gdkcairo.h>
-#include <cairo/cairo.h>
+#include <stdlib.h>
+#include <goocanvas.h>
 #include <iostream>
-#include <vector>
+#include "NeuralNetwork.h"
+#include "vectorstream.h"
 
-struct Color
+// Operators from "vectorstream.h"
+using BPN::operator<<;
+using BPN::operator>>;
+
+/**
+ * Display
+ *
+ * +--------------------------------------------------------+
+ * |               ^                                         |
+ * |               |                                        |
+ * |               3                                        |
+ * |               |                            +--+        |
+ * |<--2-->        v                            |  |        |
+ * |       +--+--+--+                           +--+        |
+ * |       |  |  |  |            +--+           |  |        |
+ * |       +--+--+--+            |  |           +--+        |
+ * |       |  |  |  |            +--+           |  |        |
+ * |       +--+--+--+            |  |           +--+        |
+ * |       |  |  |  |            +--+           |  |        |
+ * |       +--+--+--+                           +--+        |
+ * |       <1>                                  |  |        |
+ * |                 <-----4---->               +--+        |
+ * |                                                        |
+ * +--------------------------------------------------------+
+ */
+
+// 1 size of the squares 
+#define SQUARESIZE 30
+
+// 2 horizontal grid offset
+#define GRIDOFFSET_H 100
+
+// 3 vertical grid offset
+#define GRIDOFFSET_V 50
+
+// 4 space between layers
+#define LAYEROFFSET 100
+
+
+static gboolean on_delete_event      (GtkWidget      *window,
+                                      GdkEvent       *event,
+                                      gpointer        unused_data);
+
+
+
+
+class NeuralNetworkInterface;
+
+struct InputNeuronInterfaceData
 {
-  static GdkRGBA black;
-  static GdkRGBA white;
-  static GdkRGBA grey;
-  static GdkRGBA red;
-  static GdkRGBA green;
-  static GdkRGBA blue;
+  InputNeuronInterfaceData( NeuralNetworkInterface* n, int i ) : nni(n), id(i)
+  {}
+
+  NeuralNetworkInterface* nni;
+  int id;
 };
 
-GdkRGBA Color::black  = {0.0, 0.0, 0.0, 1.0};
-GdkRGBA Color::white  = {1.0, 1.0, 1.0, 1.0};
-GdkRGBA Color::grey   = {0.5, 0.5, 0.5, 1.0};
-GdkRGBA Color::red    = {1.0, 0.0, 0.0, 1.0};
-GdkRGBA Color::green  = {0.0, 1.0, 0.0, 1.0};
-GdkRGBA Color::blue   = {0.0, 0.0, 1.0, 1.0};
-
-struct Point
-{
-  Point( double x, double y ) : x(x), y(y) {}
-  double x;
-  double y;
-};
-
-class Rectangle 
+class NeuralNetworkInterface
 {
 public:
-  Rectangle( const Point& A, const Point& B ) 
-    : drawColor( Color::red )
-    , fillColor( Color::white )
+  NeuralNetworkInterface( BPN::Network& net, GtkWidget* canv ) : nn(&net), canvas(canv)
     {
-      minX = std::min( A.x ,B.x );
-      maxX = std::max( A.x ,B.x );
-      minY = std::min( A.y ,B.y );
-      maxY = std::max( A.y ,B.y );
+      int n = nn->getNumLayers();
+      layers.resize( n, std::vector<GooCanvasItem*>() );
+      buildInputGrid();
+      buildLayersDisplay();
     }
 
-  Rectangle( const Rectangle& other ) 
-    : minX( other.minX )
-      , maxX( other.maxX )
-      , minY( other.minY )
-      , maxY( other.maxY )
-      , drawColor( other.drawColor )
-      , fillColor( other.fillColor )
-    { }
+private:
 
-  void drawSelf( cairo_t* cr )
+  void buildInputGrid()
     {
-
-      cairo_set_source_rgb( cr, fillColor.red, fillColor.green, fillColor.blue  );
-      cairo_set_line_width( cr, 1 );
-
-      cairo_rectangle( cr, minX, minY, maxX, maxY );
-      cairo_fill_preserve( cr );
-      cairo_set_source_rgb( cr, drawColor.red, drawColor.green, drawColor.blue  );
-      cairo_stroke( cr );
-
-    }
-
-  void inverseFillColor()
-    {
-      fillColor.red   = 1.0 - fillColor.red;
-      fillColor.green = 1.0 - fillColor.green;
-      fillColor.blue  = 1.0 - fillColor.blue;
-    }
-
-  bool is_inside( const Point& p )
-    {
-      return ( minX <= p.x ) && ( p.x <= maxX ) && ( minY <= p.y ) && ( p.y <= maxY );
-    }
-
-  friend std::ostream& operator<<( std::ostream& os, const Rectangle& r );
-
-protected:
-  int minX, maxX, minY, maxY;
-  GdkRGBA drawColor;
-  GdkRGBA fillColor;
-};
-
-std::ostream& operator<<( std::ostream& os, const Rectangle& r )
-{
-  os << "Rectangle( (" << r.minX << ", " << r.minY << "), (" << r.maxX << ", " << r.maxY << ") )";
-  return os;
-}
-
-     
-
-gboolean
-draw_callback (GtkWidget *widget, cairo_t *cr, gpointer data)
-{
-  std::vector<Rectangle>* v = (std::vector<Rectangle>*) data;
-
-  static double d = 2.0;
-  static double inc = -0.1;
-
-
-  guint width, height;
-  GdkRGBA color;
-  GtkStyleContext *context;
-
-  context = gtk_widget_get_style_context (widget);
-
-  width = gtk_widget_get_allocated_width (widget);
-  height = gtk_widget_get_allocated_height (widget);
-
-  gtk_render_background (context, cr, 0, 0, width, height);
-
-  cairo_arc (cr,
-             width / 2.0, height / 2.0,
-             MIN (width, height) / 2.0,
-             0, d * G_PI);
-  d += inc;
-  if ( d < 0.0 || d > 2.0)
-    {
-      inc = -inc;
-      d += 2*inc;
-    }
-
-
-
-  gtk_style_context_get_color (context,
-                               gtk_style_context_get_state (context),
-                               &color);
-  gdk_cairo_set_source_rgba (cr, &color);
-
-  cairo_fill (cr);
-
-  for ( Rectangle r : *v ) 
-    {
-      r.drawSelf( cr );
-    }
-
-
- return FALSE;
-}
-
-static gboolean 
-clicked(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
-{
-  std::vector<Rectangle>* v = (std::vector<Rectangle>*) user_data;
-  Point p( (int)event->x, (int)event->y );
-  std::cout << "widget " << widget << std::endl;
-  std::cout << "click ("  << event->x << ", " << event->y << ")"<< std::endl;
-  if ( event->button == 1 )
-    {
-      for ( Rectangle& r : *v )
+      GooCanvasItem *root, *square;
+      root = goo_canvas_get_root_item (GOO_CANVAS (canvas));
+      int n = nn->getNumInputs();
+      input.resize( n, 0.0 );
+      int nRows = std::floor( std::sqrt(n) );
+      int nCols = std::ceil(  std::sqrt(n) );
+      int id = 0;
+      for (int i=0; i<nRows; ++i)
         {
-          if ( r.is_inside( p ) )
+          for (int j=0; j<nCols; ++j)
             {
-              std::cout << "Inside " << r << std::endl;
-              r.inverseFillColor();
+              int x = GRIDOFFSET_H + j*SQUARESIZE;
+              int y = GRIDOFFSET_V + i*SQUARESIZE;
+              square = goo_canvas_rect_new (root, x, y, SQUARESIZE, SQUARESIZE,
+                                            //"line-width", 10.0,
+                                            //"radius-x", 20.0,
+                                            //"radius-y", 10.0,
+                                            "stroke-color", "black",
+                                            "fill-color", "white",
+                                            NULL);
+              InputNeuronInterfaceData* data = new InputNeuronInterfaceData(this, id);
+              g_signal_connect (square, "button_press_event",
+                                (GtkSignalFunc) inputNeuronsClicked, data );
+              layers[0].push_back( square );
+              ++id;
+            }
+        }
+      this->gridWidth = nRows;
+    }
+
+  void buildLayersDisplay()
+    {
+      GooCanvasItem *root, *square;
+      root = goo_canvas_get_root_item (GOO_CANVAS (canvas));
+      int n = nn->getNumLayers();
+      const std::vector<int>& layersSizes = nn->getLayerSizes();
+      for ( int i=1; i<n; ++i )
+        {
+          for ( int j=0; j<layersSizes[i]; ++j )
+            {
+              int x = GRIDOFFSET_H + SQUARESIZE*gridWidth + i*LAYEROFFSET + (i-1)*SQUARESIZE;
+              int y = GRIDOFFSET_V + j*SQUARESIZE;
+              square = goo_canvas_rect_new (root, x, y, SQUARESIZE, SQUARESIZE,
+                                            //"line-width", 10.0,
+                                            //"radius-x", 20.0,
+                                            //"radius-y", 10.0,
+                                            "stroke-color", "black",
+                                            "fill-color", "white",
+                                            NULL);
+              layers[i].push_back( square );
+            }
+        }
+    }
+
+  void flipInput(unsigned int n)
+    {
+      if ( n < input.size() )
+        {
+          input[n] = 1.0 - input[n];
+        }
+    }
+
+  static gboolean inputNeuronsClicked (GooCanvasItem  *view,
+                                GooCanvasItem  *target,
+                                GdkEventButton *event,
+                                gpointer        user_data)
+    {
+      (void) view; (void) target; (void) event;
+      InputNeuronInterfaceData * data = (InputNeuronInterfaceData*) user_data;
+      data->nni->flipInput( data->id );
+      data->nni->update();
+      std::cout << "Clicked on input neuron " << data->id << std::endl; 
+      //g_object_set(nni->squares[id], "fill-color", "black", NULL);
+    }
+
+  guint doubleToColor( double d )
+    {
+      int r=0,g=0,b=0,a=255;
+      /* the color we want to use */
+      if ( d < 0 && d <= neuronsMinValue )
+        r = 255;
+      else if ( d < 0 ) 
+        r = (int) 255 - (int) (255.0*(-d/neuronsMinValue));
+      else if ( d < neuronsMaxValue ) 
+        b = (int) 255 - (int) (255.0*(d/neuronsMaxValue));
+      else
+        b = 255;
+      return (r<<24) + (g<<16) + (b<<8) + a;
+    }
+
+
+  void update()
+    {
+      int n = nn->getNumLayers();
+      const std::vector<int>& layersSizes = nn->getLayerSizes();
+      nn->Evaluate( input );
+
+      // input neurons
+      for ( int j=0; j<layersSizes[0]; ++j )
+        {
+          double v = nn->getValue( 0, j );
+          GooCanvasItem* square = layers[0][j];
+          if ( v == 0.0 )
+            {
+              g_object_set(square, "fill-color", "white", NULL);
             }
           else
             {
-              std::cout << "Outside " << r << std::endl;
+              g_object_set(square, "fill-color", "black", NULL);
             }
         }
-      gtk_widget_queue_draw(widget);
+      for ( int i=1; i<n; ++i ) 
+        {
+          std::vector<double> thisLayer;
+          for ( int j=0; j<layersSizes[i]; ++j )
+            {
+              double v = nn->getValue( i, j );
+              neuronsMaxValue = std::max( neuronsMaxValue, v );
+              neuronsMinValue = std::min( neuronsMinValue, v );
+              GooCanvasItem* square = layers[i][j];
+              g_object_set( square, "fill-color-rgba", doubleToColor(v), NULL );
+              thisLayer.push_back(v);
+            }
+          std::cout << "Layer " << i << " : " << thisLayer << std::endl;
+        }
     }
-  //draw_callback( widget, (cairo_t*) widget, NULL );
 
-}
+  BPN::Network* nn;
+  GtkWidget* canvas;
+  std::vector< std::vector<GooCanvasItem*> > layers;
+  std::vector<double> input;
+  int gridWidth;
+  double neuronsMaxValue;
+  double neuronsMinValue;
+};
+     
 
-static void activate (GtkApplication *app, gpointer user_data)
+int
+main (int argc, char *argv[])
 {
-  std::vector<Rectangle>* v = (std::vector<Rectangle>*) user_data;
-  GtkWidget *window;
-  GtkWidget *drawing_area;
+  GtkWidget *window, *scrolled_win, *canvas;
+  //GooCanvasItem *root;
 
-  /* create a new window, and set its title */
-  window = gtk_application_window_new (app);
-  gtk_window_set_title (GTK_WINDOW (window), "Now I understand !");
-  gtk_container_set_border_width (GTK_CONTAINER (window), 10);
+  /* Initialize GTK+. */
+  gtk_set_locale ();
+  gtk_init (&argc, &argv);
 
-  /* Here we construct the container that is going pack our buttons */
-  drawing_area = gtk_drawing_area_new();
-  gtk_widget_set_size_request (drawing_area, 700, 500);
-  g_signal_connect (G_OBJECT (drawing_area), "draw",
-                    G_CALLBACK (draw_callback), (gpointer) v );
-  g_signal_connect(G_OBJECT(window), "button-press-event", G_CALLBACK(clicked), (gpointer) v);
+  /* Create the window and widgets. */
+  window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_default_size (GTK_WINDOW (window), 840, 600);
+  gtk_widget_show (window);
+  g_signal_connect (window, "delete_event", (GtkSignalFunc) on_delete_event,
+                    NULL);
 
-  /* Pack the container in the window */
-  gtk_container_add (GTK_CONTAINER (window), drawing_area);
+  scrolled_win = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolled_win),
+                                       GTK_SHADOW_IN);
+  gtk_widget_show (scrolled_win);
+  gtk_container_add (GTK_CONTAINER (window), scrolled_win);
 
-  gtk_widget_show_all (window);
+  canvas = goo_canvas_new ();
+  gtk_widget_set_size_request (canvas, 600, 450);
+  goo_canvas_set_bounds (GOO_CANVAS (canvas), 0, 0, 1000, 1000);
+  gtk_widget_show (canvas);
+  gtk_container_add (GTK_CONTAINER (scrolled_win), canvas);
 
+
+  BPN::Network nn( std::cin );
+  NeuralNetworkInterface nni( nn, canvas );
+
+  /* Pass control to the GTK+ main event loop. */
+  gtk_main ();
+
+  return 0;
 }
 
-int main (int argc, char **argv)
+
+
+/* This is our handler for the "delete-event" signal of the window, which
+   is emitted when the 'x' close button is clicked. We just exit here. */
+static gboolean
+on_delete_event (GtkWidget *window,
+                 GdkEvent  *event,
+                 gpointer   unused_data)
 {
-  GtkApplication *app;
-  int status;
-
-  app = gtk_application_new ("org.gtk.example", G_APPLICATION_FLAGS_NONE);
-
-  std::vector<Rectangle> v; 
-  v.push_back( Rectangle( Point(10, 10), Point(50, 50) ) );
-  v.push_back( Rectangle( Point(310, 310), Point(350, 350) ) );
-
-  g_signal_connect (app, "activate", G_CALLBACK (activate), (gpointer) &v );
-  status = g_application_run (G_APPLICATION (app), argc, argv);
-  g_object_unref (app);
-
-  return status;
+  (void) window; (void) event; (void) unused_data;
+  std::cout << "Quit" << std::endl;
+  exit (0);
 }
+
