@@ -64,7 +64,7 @@ int main( int argc, char* argv[] )
   std::string const trainingDataPath  = cmdParser.get<std::string>( "d" ).c_str();
   std::string const layers            = cmdParser.get<std::string>( "l" );
   std::string const importFile        = cmdParser.get<std::string>( "i" );
-  std::string const expotFile         = cmdParser.get<std::string>( "e" );
+  std::string const exportFile        = cmdParser.get<std::string>( "e" );
   uint32_t const    maxEpoch          = cmdParser.get<uint32_t>( "m" );
   double            learningRate      = cmdParser.get<double>( "r" );
   double            momentum          = cmdParser.get<double>( "mom" );
@@ -155,14 +155,20 @@ int main( int argc, char* argv[] )
       std::cout << *nn << std::endl;
     }
 
-  if ( expotFile.compare("") != 0 )
+  if ( exportFile.compare("") != 0 )
     {
-      //TODO manage export file
-      std::cout << nn->serialize() << std::endl;
+      if ( exportFile.compare("-") == 0 )
+        {
+          std::cout << nn->serialize() << std::endl;
+        }
+      else
+        {
+          std::fstream fs;
+          fs.open( exportFile, std::fstream::out );
+          fs << nn->serialize() << std::endl;
+        }
     }
   delete nn;
-
-
   return 0;
 }
 

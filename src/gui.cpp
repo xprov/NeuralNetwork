@@ -31,7 +31,7 @@ using BPN::operator>>;
  */
 
 // 1 size of the squares 
-#define SQUARESIZE 30
+#define SQUARESIZE 20
 
 // 2 horizontal grid offset
 #define GRIDOFFSET_H 100
@@ -70,6 +70,20 @@ public:
       layers.resize( n, std::vector<GooCanvasItem*>() );
       buildInputGrid();
       buildLayersDisplay();
+
+      // Reset button
+      GooCanvasItem *root, *resetButton;
+      root = goo_canvas_get_root_item (GOO_CANVAS (canvas));
+      resetButton = goo_canvas_rect_new( root, 
+                                        GRIDOFFSET_H + SQUARESIZE*(gridWidth/2-1), 
+                                        GRIDOFFSET_V + SQUARESIZE*(gridHeight+2),
+                                        2*SQUARESIZE, SQUARESIZE,
+                                        "stroke-color", "black",
+                                        "fill-color",   "red",
+                                        NULL );
+      g_signal_connect (resetButton, "button_press_event",
+                        (GtkSignalFunc) resetInputNeurons, this );
+      update();
     }
 
 private:
@@ -98,12 +112,13 @@ private:
                                             NULL);
               InputNeuronInterfaceData* data = new InputNeuronInterfaceData(this, id);
               g_signal_connect (square, "button_press_event",
-                                (GtkSignalFunc) inputNeuronsClicked, data );
+                                (GtkSignalFunc) inputNeuronClicked, data );
               layers[0].push_back( square );
               ++id;
             }
         }
       this->gridWidth = nRows;
+      this->gridHeight = nCols;
     }
 
   void buildLayersDisplay()
@@ -117,14 +132,14 @@ private:
           for ( int j=0; j<layersSizes[i]; ++j )
             {
               int x = GRIDOFFSET_H + SQUARESIZE*gridWidth + i*LAYEROFFSET + (i-1)*SQUARESIZE;
-              int y = GRIDOFFSET_V + j*SQUARESIZE;
-              square = goo_canvas_rect_new (root, x, y, SQUARESIZE, SQUARESIZE,
-                                            //"line-width", 10.0,
-                                            //"radius-x", 20.0,
-                                            //"radius-y", 10.0,
-                                            "stroke-color", "black",
-                                            "fill-color", "white",
-                                            NULL);
+              int y = GRIDOFFSET_V + 2*j*SQUARESIZE;
+              square = goo_canvas_rect_new ( root, x, y, SQUARESIZE, SQUARESIZE,
+                                             //"line-width", 10.0,
+                                             //"radius-x", 20.0,
+                                             //"radius-y", 10.0,
+                                             "stroke-color", "black",
+                                             "fill-color", "white",
+                                             NULL);
               layers[i].push_back( square );
             }
         }
@@ -138,7 +153,19 @@ private:
         }
     }
 
-  static gboolean inputNeuronsClicked (GooCanvasItem  *view,
+  static gboolean resetInputNeurons (GooCanvasItem  *view,
+                                     GooCanvasItem  *target,
+                                     GdkEventButton *event,
+                                     gpointer        user_data)
+    {
+      (void) view; (void) target; (void) event;
+      NeuralNetworkInterface* nni = (NeuralNetworkInterface*) user_data;
+      nni->input.clear();
+      nni->input.resize( nni->nn->getNumInputs(), 0.0 );
+      nni->update();
+    }
+
+  static gboolean inputNeuronClicked (GooCanvasItem  *view,
                                 GooCanvasItem  *target,
                                 GdkEventButton *event,
                                 gpointer        user_data)
@@ -153,17 +180,9 @@ private:
 
   guint doubleToColor( double d )
     {
-      int r=0,g=0,b=0,a=255;
-      /* the color we want to use */
-      if ( d < 0 && d <= neuronsMinValue )
-        r = 255;
-      else if ( d < 0 ) 
-        r = (int) 255 - (int) (255.0*(-d/neuronsMinValue));
-      else if ( d < neuronsMaxValue ) 
-        b = (int) 255 - (int) (255.0*(d/neuronsMaxValue));
-      else
-        b = 255;
-      return (r<<24) + (g<<16) + (b<<8) + a;
+      d = ((d-neuronsMinValue) * ( neuronsMaxValue-neuronsMinValue )) + neuronsMinValue;
+      int g = (int) (255*d);
+      return (g<<24) + (g<<16) + (g<<8) + 255;
     }
 
 
@@ -208,6 +227,7 @@ private:
   std::vector< std::vector<GooCanvasItem*> > layers;
   std::vector<double> input;
   int gridWidth;
+  int gridHeight;
   double neuronsMaxValue;
   double neuronsMinValue;
 };
@@ -225,7 +245,7 @@ main (int argc, char *argv[])
 
   /* Create the window and widgets. */
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_default_size (GTK_WINDOW (window), 840, 600);
+  gtk_window_set_default_size (GTK_WINDOW (window), 1200, 800);
   gtk_widget_show (window);
   g_signal_connect (window, "delete_event", (GtkSignalFunc) on_delete_event,
                     NULL);
@@ -237,8 +257,8 @@ main (int argc, char *argv[])
   gtk_container_add (GTK_CONTAINER (window), scrolled_win);
 
   canvas = goo_canvas_new ();
-  gtk_widget_set_size_request (canvas, 600, 450);
-  goo_canvas_set_bounds (GOO_CANVAS (canvas), 0, 0, 1000, 1000);
+  gtk_widget_set_size_request (canvas, 1200, 800);
+  goo_canvas_set_bounds (GOO_CANVAS (canvas), 0, 0, 1200, 800);
   gtk_widget_show (canvas);
   gtk_container_add (GTK_CONTAINER (scrolled_win), canvas);
 
