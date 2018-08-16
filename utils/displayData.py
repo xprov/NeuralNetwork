@@ -2,7 +2,6 @@
 from sys import argv, stdin
 
 if __name__ == '__main__':
-    print(argv)
     if len(argv) == 2:
         print('aqui')
         iterator = stdin

@@ -171,8 +171,16 @@ private:
                                 gpointer        user_data)
     {
       (void) view; (void) target; (void) event;
+      std::cout << event->button << std::endl;
       InputNeuronInterfaceData * data = (InputNeuronInterfaceData*) user_data;
-      data->nni->flipInput( data->id );
+      if ( event->button == 1 )
+        {
+          data->nni->input[data->id] = 1.0;
+        }
+      else if ( event->button == 3 )
+        {
+          data->nni->input[data->id] = 0.0;
+        }
       data->nni->update();
       std::cout << "Clicked on input neuron " << data->id << std::endl; 
       //g_object_set(nni->squares[id], "fill-color", "black", NULL);
