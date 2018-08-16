@@ -18,7 +18,7 @@ A single bit in input, same bit in output (for debugging)
 ./trainBPN -d ../Example/bit -in 1 -hidden 2,3,2 -out 1
 ```
 
-### File : detectShape
+### File : detectShape (zipped)
 30x30 binary images to classify in three categories : 
  - 1,0,0 --> straight line
  - 0,1,0 --> rectangle
@@ -29,15 +29,16 @@ All images contain about the same number of 1s and 0s.
 ```
 ./trainBPN -d ../Example/detectShape -in 900 -hidden 20 -out 3
 ```
-### File : detectThreeShape
-50x50 binary images to classify in three categories : 
+
+### File : detectThreeShape (zipped)
+40x40 binary images to classify in three categories : 
  - 1,0,0 --> straight line
  - 0,1,0 --> rectangle
  - 0,0,1 --> triangle
  - 0,0,0 --> random data
 All images contain about the same number of 1s and 0s.
- - num input : 2500
+ - num input : 1600
  - num output : 3
 ```
-./trainBPN -d ../Example/detectThreeShapes -l 2500,100,3
+./trainBPN -d ../Example/detectThreeShapes -l 1600,100,3
 ```

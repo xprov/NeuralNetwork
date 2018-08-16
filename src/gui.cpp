@@ -245,7 +245,7 @@ main (int argc, char *argv[])
 
   /* Create the window and widgets. */
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_default_size (GTK_WINDOW (window), 1200, 800);
+  gtk_window_set_default_size (GTK_WINDOW (window), 1600, 1000);
   gtk_widget_show (window);
   g_signal_connect (window, "delete_event", (GtkSignalFunc) on_delete_event,
                     NULL);
@@ -257,8 +257,8 @@ main (int argc, char *argv[])
   gtk_container_add (GTK_CONTAINER (window), scrolled_win);
 
   canvas = goo_canvas_new ();
-  gtk_widget_set_size_request (canvas, 1200, 800);
-  goo_canvas_set_bounds (GOO_CANVAS (canvas), 0, 0, 1200, 800);
+  gtk_widget_set_size_request (canvas, 1600, 1000);
+  goo_canvas_set_bounds (GOO_CANVAS (canvas), 0, 0, 1600, 1000);
   gtk_widget_show (canvas);
   gtk_container_add (GTK_CONTAINER (scrolled_win), canvas);
 
