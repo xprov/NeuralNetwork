@@ -92,6 +92,8 @@ Here are some examples :
  - Some random points ; the third output neuron is active.
 ![random detection](https://github.com/xprov/NeuralNetwork/blob/master/images/detectRandom.png)
 
+Note : the little red square on the bottom resets the input grid.
+
 
 
 
