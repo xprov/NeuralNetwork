@@ -193,7 +193,7 @@ class Matrix :
             for j in range(startCol, endCol):
                 self.set(i, j, 1)
 
-    def drawRandomSquare(self):
+    def drawRandomRectangle(self):
         ok = False
         minWidth  = min(2,  self.nCols() // 2)
         maxWidth  = min(15, self.nCols() // 2)
@@ -236,7 +236,7 @@ class Matrix :
     def drawRandomTriangle(self):
         ok = False
         minSideLength = min(5,  self.nCols()//2, self.nRows()//2)
-        maxSideLength = min(15, self.nCols()//2, self.nRows()//2)
+        maxSideLength = min(20, self.nCols()//2, self.nRows()//2)
         minAngle = 30.0
         while not ok :
             A = self.randomPoint()
@@ -278,7 +278,7 @@ def genData(width, height, n):
             m.drawRandomLine()
             suffix = ",1,0,0"
         elif r < 0.5:
-            m.drawRandomSquare()
+            m.drawRandomRectangle()
             suffix = ",0,1,0"
         elif r < 0.75:
             m.drawRandomTriangle()

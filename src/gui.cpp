@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <goocanvas.h>
 #include <iostream>
+#include <fstream>
 #include "NeuralNetwork.h"
 #include "vectorstream.h"
 
@@ -61,10 +62,16 @@ struct InputNeuronInterfaceData
   int id;
 };
 
+struct MouseMode
+{
+  static guint currentMode;
+};
+guint MouseMode::currentMode = 0;
+
 class NeuralNetworkInterface
 {
 public:
-  NeuralNetworkInterface( BPN::Network& net, GtkWidget* canv ) : nn(&net), canvas(canv)
+  NeuralNetworkInterface( BPN::Network* net, GtkWidget* canv ) : nn(net), canvas(canv)
     {
       int n = nn->getNumLayers();
       layers.resize( n, std::vector<GooCanvasItem*>() );
@@ -111,8 +118,15 @@ private:
                                             "fill-color", "white",
                                             NULL);
               InputNeuronInterfaceData* data = new InputNeuronInterfaceData(this, id);
+              //g_signal_connect (square, "button_press_event",
+              //                  (GtkSignalFunc) inputNeuronClicked, data );
               g_signal_connect (square, "button_press_event",
-                                (GtkSignalFunc) inputNeuronClicked, data );
+                                (GtkSignalFunc) inputNeuronPressed, data );
+              //g_signal_connect (square, "button_release_event",
+              //                  (GtkSignalFunc) inputNeuronRelease, data );
+              gtk_widget_add_events((GtkWidget*)square, GDK_POINTER_MOTION_MASK);
+              g_signal_connect (square, "motion_notify_event",
+                                (GtkSignalFunc) inputNeuronTouched, data );
               layers[0].push_back( square );
               ++id;
             }
@@ -159,16 +173,26 @@ private:
                                      gpointer        user_data)
     {
       (void) view; (void) target; (void) event;
+      MouseMode::currentMode = 0;
       NeuralNetworkInterface* nni = (NeuralNetworkInterface*) user_data;
       nni->input.clear();
       nni->input.resize( nni->nn->getNumInputs(), 0.0 );
       nni->update();
     }
 
+  static gboolean inputNeuronPressed (GooCanvasItem  *view,
+                                      GooCanvasItem  *target,
+                                      GdkEventButton *event,
+                                      gpointer        user_data)
+    {
+      (void) view; (void) target; (void) user_data;
+      MouseMode::currentMode = (MouseMode::currentMode == event->button) ? 0 : event->button;
+    }
+
   static gboolean inputNeuronClicked (GooCanvasItem  *view,
-                                GooCanvasItem  *target,
-                                GdkEventButton *event,
-                                gpointer        user_data)
+                                      GooCanvasItem  *target,
+                                      GdkEventButton *event,
+                                      gpointer        user_data)
     {
       (void) view; (void) target; (void) event;
       std::cout << event->button << std::endl;
@@ -183,7 +207,25 @@ private:
         }
       data->nni->update();
       std::cout << "Clicked on input neuron " << data->id << std::endl; 
-      //g_object_set(nni->squares[id], "fill-color", "black", NULL);
+    }
+
+  static gboolean inputNeuronTouched (GooCanvasItem  *view,
+                                      GooCanvasItem  *target,
+                                      GdkEventMotion *event,
+                                      gpointer        user_data)
+    {
+      (void) view; (void) target; (void) event; (void) user_data;
+      InputNeuronInterfaceData * data = (InputNeuronInterfaceData*) user_data;
+      if ( MouseMode::currentMode == 1 )
+        {
+          data->nni->input[data->id] = 1.0;
+          data->nni->update();
+        }
+      else if ( MouseMode::currentMode == 3 )
+        {
+          data->nni->input[data->id] = 0.0;
+          data->nni->update();
+        }
     }
 
   guint doubleToColor( double d )
@@ -226,7 +268,7 @@ private:
               g_object_set( square, "fill-color-rgba", doubleToColor(v), NULL );
               thisLayer.push_back(v);
             }
-          std::cout << "Layer " << i << " : " << thisLayer << std::endl;
+          //std::cout << "Layer " << i << " : " << thisLayer << std::endl;
         }
     }
 
@@ -270,13 +312,24 @@ main (int argc, char *argv[])
   gtk_widget_show (canvas);
   gtk_container_add (GTK_CONTAINER (scrolled_win), canvas);
 
+  BPN::Network* nn;
 
-  BPN::Network nn( std::cin );
+  if ( argc == 1 )
+    {
+      nn = new BPN::Network( std::cin );
+    }
+  else 
+    {
+      std::fstream fs;
+      fs.open( argv[1], std::fstream::in );
+      nn = new BPN::Network( fs );
+    }
   NeuralNetworkInterface nni( nn, canvas );
 
   /* Pass control to the GTK+ main event loop. */
   gtk_main ();
 
+  delete nn;
   return 0;
 }
 
