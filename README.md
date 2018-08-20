@@ -31,22 +31,23 @@ mkdir release && cd release && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j
 ```
 
 # Typical usage
-Let's train a Network using data from the ``detectShape`` file. In this
-example, the input are binary pictures of size 40x40. Consequently, there needs
-to be 1600 input neurons on the first layer. The output is layer must have size
-3 since the data is classified in three categories :
+Let's train a Network using data from the
+``Example/threeShapes/data/threeShapes.csv`` file. In this example, the input
+are binary pictures of size 40x40. Consequently, there needs to be 1600 input
+neurons on the first layer. The output is layer must have size 3 since the data
+is classified in three categories :
 
-1. Straight line.
-2. Rectangle.
-3. Triangles.
+1. Straight line (first output neuron).
+2. Rectangle (second output neuron).
+3. Triangles (third output neuron).
 
 Here we choose to have 3 hidden layers of size 20, so the "-l" argument is
 "1600,20,20,20,3". Finally, we stop the learning once our network has obtain at
 least 90% accuracy on the genaralization set.
 
 ```
-./trainBPN -d ../Example/detectShape -l 1600,20,20,20,3 -a 99 -e myTrainedNN
-Input file: ../Example/detectShape
+./trainBPN -d ../Example/threeShapes/data/threeShapes.csv -l 1600,20,20,20,3 -a 99 -e myTrainedNN
+Input file: ../Example/threeShapes/data/threeShapes.csv
 Read complete: 100000 inputs loaded
 
  Neural Network Training Starting: 
