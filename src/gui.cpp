@@ -1,9 +1,16 @@
+//-------------------------------------------------------------------------
+// Simple back-propagation neural network example
+// 2018 - Xavier Provençal
+// MIT license: https://opensource.org/licenses/MIT
+//-------------------------------------------------------------------------
+
 #include <stdlib.h>
 #include <goocanvas.h>
 #include <iostream>
 #include <fstream>
 #include "NeuralNetwork.h"
 #include "vectorstream.h"
+#include "cmdParser.h"
 
 // Operators from "vectorstream.h"
 using BPN::operator<<;
@@ -71,25 +78,52 @@ guint MouseMode::currentMode = 0;
 class NeuralNetworkInterface
 {
 public:
-  NeuralNetworkInterface( BPN::Network* net, GtkWidget* canv ) : nn(net), canvas(canv)
+  NeuralNetworkInterface( BPN::Network* net, 
+                          GtkWidget* canv, 
+                          const std::vector<std::string>& outputLabels )
+    : nn(net) , canvas(canv)
     {
       int n = nn->getNumLayers();
       layers.resize( n, std::vector<GooCanvasItem*>() );
       buildInputGrid();
-      buildLayersDisplay();
+      buildLayersDisplay( outputLabels );
 
       // Reset button
-      GooCanvasItem *root, *resetButton;
+      GooCanvasItem *root, *resetButton, *resetText, *mouseActionText;
       root = goo_canvas_get_root_item (GOO_CANVAS (canvas));
-      resetButton = goo_canvas_rect_new( root, 
-                                        GRIDOFFSET_H + SQUARESIZE*(gridWidth/2-1), 
-                                        GRIDOFFSET_V + SQUARESIZE*(gridHeight+2),
-                                        2*SQUARESIZE, SQUARESIZE,
-                                        "stroke-color", "black",
-                                        "fill-color",   "red",
-                                        NULL );
+      int x = GRIDOFFSET_H + SQUARESIZE*(gridWidth/2-2); 
+      int y = GRIDOFFSET_V + SQUARESIZE*(gridHeight+2);
+      int width  = 4*SQUARESIZE;
+      int height = 2*SQUARESIZE;
+      resetButton = goo_canvas_rect_new( root, x, y, width, height, 
+                                         "stroke-color", "black",
+                                         "fill-color",   "red",
+                                         NULL );
       g_signal_connect (resetButton, "button_press_event",
                         (GtkSignalFunc) resetInputNeurons, this );
+
+      resetText = goo_canvas_text_new( root,
+                                       "Reset",
+                                        x + width/2, y + height/2,
+                                        -1, GTK_ANCHOR_CENTER, NULL);
+
+      g_signal_connect (resetText, "button_press_event",
+                        (GtkSignalFunc) resetInputNeurons, this );
+
+      // Display the action that is currently performed when the mouse pointer
+      // touches an input neuron
+      mouseActionText = goo_canvas_text_new( root,
+                                             "Action",
+                                             x + width/2, y + 2*SQUARESIZE + height/2,
+                                             -1, GTK_ANCHOR_EAST, NULL );
+
+      mouseActionSquare = goo_canvas_rect_new( root, 
+                                              x + width/2 + SQUARESIZE, 
+                                              y + 1.5*SQUARESIZE + height/2,
+                                              SQUARESIZE, SQUARESIZE,
+                                              "stroke-color", "white",
+                                              "fill-color", "white",
+                                              NULL );
       update();
     }
 
@@ -135,7 +169,7 @@ private:
       this->gridHeight = nCols;
     }
 
-  void buildLayersDisplay()
+  void buildLayersDisplay( const std::vector<std::string>& outputLabels)
     {
       GooCanvasItem *root, *square;
       root = goo_canvas_get_root_item (GOO_CANVAS (canvas));
@@ -155,6 +189,17 @@ private:
                                              "fill-color", "white",
                                              NULL);
               layers[i].push_back( square );
+              if ( i == n-1 )
+                {
+                  try {
+                      const char* text = outputLabels.at(j).c_str();
+                      GooCanvasItem * label = goo_canvas_text_new( root, text, x + 2*SQUARESIZE, y+SQUARESIZE/2,
+                                                                  -1, GTK_ANCHOR_WEST, NULL );
+                  }
+                  catch ( std::out_of_range e )
+                    {
+                    }
+                }
             }
         }
     }
@@ -186,7 +231,22 @@ private:
                                       gpointer        user_data)
     {
       (void) view; (void) target; (void) user_data;
-      MouseMode::currentMode = (MouseMode::currentMode == event->button) ? 0 : event->button;
+      InputNeuronInterfaceData * data = (InputNeuronInterfaceData*) user_data;
+      if ( MouseMode::currentMode != 1 && event->button == 1 )
+        {
+          data->nni->input[data->id] = 1.0;
+          MouseMode::currentMode = 1;
+        }
+      else if ( MouseMode::currentMode != 3 && event->button == 3 )
+        {
+          data->nni->input[data->id] = 0.0;
+          MouseMode::currentMode = 3;
+        }
+      else if ( MouseMode::currentMode == event->button )
+        {
+          MouseMode::currentMode = 0;
+        }
+      data->nni->update();
     }
 
   static gboolean inputNeuronClicked (GooCanvasItem  *view,
@@ -216,6 +276,7 @@ private:
     {
       (void) view; (void) target; (void) event; (void) user_data;
       InputNeuronInterfaceData * data = (InputNeuronInterfaceData*) user_data;
+      std::cout << "MouseMode = " << MouseMode::currentMode << std::endl;
       if ( MouseMode::currentMode == 1 )
         {
           data->nni->input[data->id] = 1.0;
@@ -256,6 +317,8 @@ private:
               g_object_set(square, "fill-color", "black", NULL);
             }
         }
+
+      // Hidden and output layers
       for ( int i=1; i<n; ++i ) 
         {
           std::vector<double> thisLayer;
@@ -270,6 +333,23 @@ private:
             }
           //std::cout << "Layer " << i << " : " << thisLayer << std::endl;
         }
+
+      // Display mouse action button
+      if ( MouseMode::currentMode == 0 ) 
+        {
+          g_object_set( mouseActionSquare, "fill-color", "grey", NULL );
+          g_object_set( mouseActionSquare, "stroke-color", "grey", NULL );
+        }
+      else if ( MouseMode::currentMode == 1 )
+        {
+          g_object_set( mouseActionSquare, "fill-color", "black", NULL );
+          g_object_set( mouseActionSquare, "stroke-color", "black", NULL );
+        }
+      else if ( MouseMode::currentMode == 3 )
+        {
+          g_object_set( mouseActionSquare, "fill-color", "white", NULL );
+          g_object_set( mouseActionSquare, "stroke-color", "black", NULL );
+        }
     }
 
   BPN::Network* nn;
@@ -280,12 +360,55 @@ private:
   int gridHeight;
   double neuronsMaxValue;
   double neuronsMinValue;
+  GooCanvasItem* mouseActionSquare;
 };
      
 
-int
-main (int argc, char *argv[])
+int main (int argc, char *argv[])
 {
+  cli::Parser cmdParser( argc, argv );
+  cmdParser.set_required<std::string>( "nn", "NeuralNetwork", "Path to the neural network export file. ( \"-\" stands for stdin )" );
+  cmdParser.set_optional<std::string>( "l", "outputLabels", "[]", "Comma separated list of the labels of the output neurons" );
+  cmdParser.set_optional<std::string>( "s", "size", "1600,1000", "Dimensions of the window, width and height separated by a comma (no blanks).");
+
+  if ( !cmdParser.run() )
+    {
+      std::cout << "Invalid command line arguments";
+      return 1;
+    }
+
+  const std::string pathToNN         = cmdParser.get<std::string>( "nn" );
+  const std::string labelsAsText     = cmdParser.get<std::string>( "l" );
+  const std::string windowSizeAsText = cmdParser.get<std::string>( "s" );
+
+
+  std::vector<std::string> labels;
+  std::stringstream labelsStream( labelsAsText );
+  labelsStream >> labels;
+
+  std::vector<int> windowSize;
+  std::stringstream windowSizesStream( windowSizeAsText );
+  windowSizesStream >> windowSize;
+  int width  = windowSize[0];
+  int height = windowSize[1];
+
+  std::cout << "path : " << pathToNN << std::endl;
+  std::cout << "labels : " << labels << std::endl;
+  std::cout << "size : " << width << " x " << height  << std::endl;
+
+
+  BPN::Network* nn;
+  if ( pathToNN.compare( "-" ) == 0 )
+    {
+      nn = new BPN::Network( std::cin );
+    }
+  else 
+    {
+      std::fstream fs;
+      fs.open( pathToNN, std::fstream::in );
+      nn = new BPN::Network( fs );
+    }
+
   GtkWidget *window, *scrolled_win, *canvas;
   //GooCanvasItem *root;
 
@@ -295,7 +418,7 @@ main (int argc, char *argv[])
 
   /* Create the window and widgets. */
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_default_size (GTK_WINDOW (window), 1600, 1000);
+  gtk_window_set_default_size (GTK_WINDOW (window), width, height);
   gtk_widget_show (window);
   g_signal_connect (window, "delete_event", (GtkSignalFunc) on_delete_event,
                     NULL);
@@ -307,24 +430,12 @@ main (int argc, char *argv[])
   gtk_container_add (GTK_CONTAINER (window), scrolled_win);
 
   canvas = goo_canvas_new ();
-  gtk_widget_set_size_request (canvas, 1600, 1000);
-  goo_canvas_set_bounds (GOO_CANVAS (canvas), 0, 0, 1600, 1000);
+  gtk_widget_set_size_request (canvas, width, height );
+  goo_canvas_set_bounds (GOO_CANVAS (canvas), 0, 0, width, height );
   gtk_widget_show (canvas);
   gtk_container_add (GTK_CONTAINER (scrolled_win), canvas);
 
-  BPN::Network* nn;
-
-  if ( argc == 1 )
-    {
-      nn = new BPN::Network( std::cin );
-    }
-  else 
-    {
-      std::fstream fs;
-      fs.open( argv[1], std::fstream::in );
-      nn = new BPN::Network( fs );
-    }
-  NeuralNetworkInterface nni( nn, canvas );
+  NeuralNetworkInterface nni( nn, canvas, labels );
 
   /* Pass control to the GTK+ main event loop. */
   gtk_main ();

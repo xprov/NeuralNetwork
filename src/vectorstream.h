@@ -43,19 +43,22 @@ namespace BPN
   template <typename T>
     std::istream& operator>>( std::istream& is, std::vector<T>& v )
       {
+        v.clear();
         std::string s;
         getline(is, s);
-        std::stringstream ss(s);
-        std::string token;
-        T t;
-        v.clear();
-        while ( std::getline(ss, token, ',') )
+        if (s.compare("[]") != 0)
           {
-            size_t pos = token.find_first_not_of( " [" );
-            token = token.substr( pos );
-            std::stringstream sss(token);
-            sss >> t;
-            v.push_back(t);
+            std::stringstream ss(s);
+            std::string token;
+            T t;
+            while ( std::getline(ss, token, ',') )
+              {
+                size_t pos = token.find_first_not_of( " [" );
+                token = token.substr( pos );
+                std::stringstream sss(token);
+                sss >> t;
+                v.push_back(t);
+              }
           }
         return is;
       }
