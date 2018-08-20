@@ -85,7 +85,7 @@ Here are some examples :
 ![rectangle detection](https://github.com/xprov/NeuralNetwork/blob/master/images/detectRectangle.png)
 
  - A triangle ; the third output neuron is active.
-![random detection](https://github.com/xprov/NeuralNetwork/blob/master/images/detectTRiangle.png)
+![triangle detection](https://github.com/xprov/NeuralNetwork/blob/master/images/detectTriangle.png)
 
 
 
