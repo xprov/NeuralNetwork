@@ -3,11 +3,9 @@ from sys import argv, stdin
 
 if __name__ == '__main__':
     if len(argv) == 2:
-        print('aqui')
         iterator = stdin
         squareSize = int(argv[1])
     else:
-        print('aqua')
         filename = argv[1]
         squareSize = int(argv[2])
         if filename == "-" :
