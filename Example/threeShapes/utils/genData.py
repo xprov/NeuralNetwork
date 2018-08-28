@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from random import randint, random
+from random import randint, random, choice
 from sys import argv, stderr
 from math import sqrt, pi, floor, ceil, acos, pi
 
@@ -256,9 +256,40 @@ class Matrix :
         self.drawTriangle(A, B, C)
 
 
+    def drawCircle(self, centerRow, centerColumn, radius):
+        for r in range(centerRow-radius, centerRow+radius+1):
+            for c in range(centerColumn-radius, centerColumn+radius+1):
+                if 0 <= r < self.nRows()\
+                   and 0 <= c < self.nCols()\
+                   and (centerRow-r)**2 + (centerColumn-c)**2 <= radius**2:
+                    self.set(r, c, 1)
 
+    def drawRandomCircle(self):
+        radius = randint(3, min(18,self.nCols(), self.nRows())/2)
+        r = randint(radius+1, self.nRows()-radius-1)
+        c = randint(radius+1, self.nCols()-radius-1)
+        self.drawCircle(r, c, radius)
 
-
+    def unfillConvexShape(self):
+        """
+        Assumes that only one shape exists in the matrix and that this shape is convex.
+        """
+        other = Matrix(self.nRows(), self.nCols())
+        for r in range(0, self.nRows()):
+            minCol = min([self.nCols()] + [i for i in range(self.nCols()) if self.get(r,i)])
+            maxCol = max([-1] + [i for i in range(self.nCols()) if self.get(r,i)])
+            if minCol < self.nCols():
+                other.set(r, minCol, 1)
+            if maxCol >= 0:
+                other.set(r, maxCol, 1)
+        for c in range(0, self.nCols()):
+            minRow = min([self.nRows()] + [i for i in range(self.nRows()) if self.get(i,c)])
+            maxRow = max([-1] + [i for i in range(self.nRows()) if self.get(i,c)])
+            if minRow < self.nRows():
+                other.set(minRow, c, 1)
+            if maxRow >= 0:
+                other.set(maxRow, c, 1)
+        self._data = other._data
 
     def __repr__(self):
         l = []
@@ -273,19 +304,25 @@ class Matrix :
 def genData(width, height, n):
     for i in range(n):
         m = Matrix(height, width)
-        r = random()
-        if r < 0.25:
+        availableShapes = ['line', 'rectangle', 'triangle', 'circle', 'randomPoints' ]
+        shape = choice(availableShapes)
+        if shape == 'line':
             m.drawRandomLine()
-            suffix = ",1,0,0"
-        elif r < 0.5:
+            suffix = ',1,0,0,0'
+        elif shape == 'rectangle':
             m.drawRandomRectangle()
-            suffix = ",0,1,0"
-        elif r < 0.75:
+            suffix = ',0,1,0,0'
+        elif shape == 'triangle':
             m.drawRandomTriangle()
-            suffix = ",0,0,1"
-        else:
+            suffix = ',0,0,1,0'
+        elif shape == 'circle':
+            m.drawRandomCircle()
+            suffix = ',0,0,0,1'
+        elif shape == 'randomPoints':
             m.drawRandomPoints()
-            suffix = ",0,0,0"
+            suffix = ',0,0,0,0'
+        if random() < 0.5 :
+            m.unfillConvexShape()
         #print(m)
         #m.normalize()
         print(str(m.serialize()) + suffix)
