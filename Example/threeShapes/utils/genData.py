@@ -196,9 +196,9 @@ class Matrix :
     def drawRandomRectangle(self):
         ok = False
         minWidth  = min(2,  self.nCols() // 2)
-        maxWidth  = min(15, self.nCols() // 2)
+        maxWidth  = min(20, self.nCols() // 2)
         minHeight = min(2,  self.nRows() // 2)
-        maxHeight = min(15, self.nRows() // 2)
+        maxHeight = min(20, self.nRows() // 2)
         while not ok:
             a = randint(0, self.nCols()-1 )
             b = randint(0, self.nCols()-1 )
@@ -265,7 +265,7 @@ class Matrix :
                     self.set(r, c, 1)
 
     def drawRandomCircle(self):
-        radius = randint(3, min(18,self.nCols(), self.nRows())/2)
+        radius = randint(6, min(20, self.nCols()//2-1, self.nRows())//2-1)
         r = randint(radius+1, self.nRows()-radius-1)
         c = randint(radius+1, self.nCols()-radius-1)
         self.drawCircle(r, c, radius)
