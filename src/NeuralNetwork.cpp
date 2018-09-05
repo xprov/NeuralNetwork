@@ -79,6 +79,8 @@ namespace BPN
       //std::mt19937 generator( rd() );
       std::mt19937 generator( 0 );
 
+      // TODO set distributionRangeHalfWidth for each layer, replace m_numInputs
+      // by the number of neurons on the previous layer
       double const distributionRangeHalfWidth = ( 2.4 / m_numInputs );
       double const standardDeviation = distributionRangeHalfWidth * 2 / 6;
       std::normal_distribution<> normalDistribution( 0, standardDeviation );
