@@ -321,8 +321,8 @@ def genData(width, height, n):
         elif shape == 'randomPoints':
             m.drawRandomPoints()
             suffix = ',0,0,0,0'
-        if random() < 0.5 :
-            m.unfillConvexShape()
+        #if random() < 0.5 :
+        #    m.unfillConvexShape()
         #print(m)
         #m.normalize()
         print(str(m.serialize()) + suffix)
