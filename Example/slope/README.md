@@ -17,4 +17,8 @@ An example of training data is provided in the ``data`` folder. Neural Networks
 have been trianed using this data set and are available in the ``trainedNN``
 folder.
 
+```
+$ ./gui -nn ../Example/slope/trainedNN/900_20_20_20_4
+```
+
 
