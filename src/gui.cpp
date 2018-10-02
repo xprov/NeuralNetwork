@@ -88,8 +88,9 @@ public:
       buildInputGrid();
       buildLayersDisplay( outputLabels );
 
-      GooCanvasItem *root, *resetButton, *resetText, *mouseActionText, 
-                    *translateUp, *translateDown, *translateLeft, *translateRight;
+      GooCanvasItem *root, *resetButton, *noisifyButton, *resetText, *noisifyText,
+                    *mouseActionText, *translateUp, *translateDown, *translateLeft, 
+                    *translateRight;
       int x, y, width, height;
 
       // get the root canvas item where everithing else is added
@@ -114,6 +115,26 @@ public:
 
       g_signal_connect (resetText, "button_press_event",
                         (GtkSignalFunc) resetInputNeurons, this );
+
+      // Noisify button
+      x = GRIDOFFSET_H + SQUARESIZE*(gridWidth/2-8); 
+      y = GRIDOFFSET_V + SQUARESIZE*(gridHeight+2);
+      width  = 4*SQUARESIZE;
+      height = 2*SQUARESIZE;
+      noisifyButton = goo_canvas_rect_new( root, x, y, width, height, 
+                                         "stroke-color", "black",
+                                         "fill-color",   "red",
+                                         NULL );
+      g_signal_connect (noisifyButton, "button_press_event",
+                        (GtkSignalFunc) noisifyInputNeurons, this );
+
+      noisifyText = goo_canvas_text_new( root,
+                                       "Noisify",
+                                        x + width/2, y + height/2,
+                                        -1, GTK_ANCHOR_CENTER, NULL);
+
+      g_signal_connect (noisifyText, "button_press_event",
+                        (GtkSignalFunc) noisifyInputNeurons, this );
 
       int translationButtonsX = GRIDOFFSET_H + SQUARESIZE*(gridWidth/2+6); 
       int translationButtonsY = GRIDOFFSET_V + SQUARESIZE*(gridHeight+3); 
@@ -198,7 +219,7 @@ public:
       y = GRIDOFFSET_V + SQUARESIZE*(gridHeight+2) + 2*SQUARESIZE + height/2;
       mouseActionText = goo_canvas_text_new( root,
                                              "Action",
-                                             x + width/2, y + 2*SQUARESIZE + height/2,
+                                             x - SQUARESIZE/2, y + SQUARESIZE/2,
                                              -1, GTK_ANCHOR_EAST, NULL );
 
       mouseActionSquare = goo_canvas_rect_new( root, x, y,
@@ -206,6 +227,7 @@ public:
                                               "stroke-color", "white",
                                               "fill-color", "white",
                                               NULL );
+
       update();
     }
 
@@ -397,6 +419,22 @@ private:
       NeuralNetworkInterface* nni = (NeuralNetworkInterface*) user_data;
       nni->input.clear();
       nni->input.resize( nni->nn->getNumInputs(), 0.0 );
+      nni->update();
+    }
+
+  static gboolean noisifyInputNeurons (GooCanvasItem  *view,
+                                     GooCanvasItem  *target,
+                                     GdkEventButton *event,
+                                     gpointer        user_data)
+    {
+      (void) view; (void) target; (void) event;
+      MouseMode::currentMode = 0;
+      NeuralNetworkInterface* nni = (NeuralNetworkInterface*) user_data;
+      for (int i=0; i<5; ++i) 
+        {
+          int index = rand() % nni->input.size();
+          nni->input[index] = 1 - nni->input[index];
+        }
       nni->update();
     }
 
