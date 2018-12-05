@@ -86,9 +86,9 @@ int main( int argc, char* argv[] )
 
   // Select activation function
   //
-  //BPN::ActivationFunction* sigma = new BPN::Sigmoid();
+  BPN::ActivationFunction* sigma = new BPN::Sigmoid();
   //BPN::ActivationFunction* sigma = new BPN::Sigmoid(2.0);
-  BPN::ActivationFunction* sigma = new BPN::ReLU();
+  //BPN::ActivationFunction* sigma = new BPN::ReLU();
 
   // Create neural network
   BPN::Network* nn = NULL;;
