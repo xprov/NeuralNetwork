@@ -72,6 +72,7 @@ might be uselessly complicated. If you know a better way, please let me know.
 
 5. It's now time to compile ! Run the following commands:
     ```
+    cd NeuralNetwork
     mkdir build
     cd build
     cmake ..
