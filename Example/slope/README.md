@@ -18,7 +18,7 @@ have been trianed using this data set and are available in the ``trainedNN``
 folder.
 
 ```
-$ ./gui -nn ../Example/slope/trainedNN/900_20_20_20_4 -l "Higly negative","Slightly negative","Slightly positive", "Highly positive"
+$ ./gui -nn ../Example/slope/trainedNN/900_20_20_20_4 -l "Higly_negative,Slightly_negative,Slightly_positive,Highly_positive" -s 1400,850
 ```
 
 
