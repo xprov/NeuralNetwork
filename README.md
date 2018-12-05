@@ -48,8 +48,8 @@ mkdir release && cd release && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j
 Let's train a Network using data from the
 ``Example/threeShapes/data/threeShapes.csv`` file. In this example, the input
 are binary pictures of size 40x40. Consequently, there needs to be 1600 input
-neurons on the first layer. The output is layer must have size 3 since the data
-is classified in three categories :
+neurons on the first layer. The output layer must have size 3 since datas
+are classified in three categories :
 
 1. Straight line (first output neuron).
 2. Rectangle (second output neuron).
