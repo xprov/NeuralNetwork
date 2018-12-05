@@ -14,6 +14,20 @@ This code is meant to be a simple implementation of the back-propagation neural 
 
 It is intended as a reference/example implementation and will not be maintained or supported.
 
+# Required Packages
+
+This project contains two programs, a BPN trainer and a graphic interface to
+play with a trained BPN. While the trainer requires nothing more than a C++11
+compiler, the GUI requires :
+
+ - GTK+2.x or higher, including headers (libgtk2.0-dev)
+ - GooCanvas
+
+Using Synaptic Manager, the simplest way to install these dependencies is to run:
+```
+sudo apt-get install libgtk2.0-dev libgoocanvas-dev
+```
+
 
 # Compilation
 ```
