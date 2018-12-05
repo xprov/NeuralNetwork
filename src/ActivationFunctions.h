@@ -122,7 +122,7 @@ namespace BPN
         inline double evalDerivative( double x, double fx = -1.0 ) const
           {
             (void) x; (void) fx;
-            return (x > 0) ? -1 : 0;
+            return (x > 0) ? 1 : 0;
           }
 
         inline std::string serialize() const
