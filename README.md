@@ -63,7 +63,7 @@ might be uselessly complicated. If you know a better way, please let me know.
 
     Once all packages are selected, click on __next__ the install process should start. You now have enough time to grab a coffee. Once installation is completed, you may exit the installer. 
 
-3. Launch the __Cygwin prompt__, an icon should have been created on your desktop. Congratulation, you know have something that looks like a real terminal !
+3. Launch the __Cygwin prompt__, an icon should have been created on your desktop. Congratulations, you now have something that looks like a real terminal !
 
 4. Get the files from Github, enter the following command:
     ```
@@ -79,16 +79,16 @@ might be uselessly complicated. If you know a better way, please let me know.
     make
     ```
 
-# Debug VS Release mode
+# Debug VS Release Mode
 
-Since the training of neural network requires a lot of computation power, one might find useful to compile a debug and a release versions (the release version should run significantly faster):
+Since the training of a neural network requires a lot of computational power, one might find useful to compile a debug and a release versions (the release version should run significantly faster):
 ```
 mkdir debug && cd debug && cmake -DCMAKE_BUILD_TYPE=Debug .. && make -j
 cd ..
 mkdir release && cd release && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j
 ```
 
-# Typical usage
+# Typical Usage
 Let's train a Network using data from the
 ``Example/threeShapes/data/threeShapes.csv`` file. In this example, the input
 are binary pictures of size 40x40. Consequently, there needs to be 1600 input
@@ -100,11 +100,11 @@ are classified in three categories :
 3. Triangles (third output neuron).
 
 Here we choose to have 3 hidden layers of size 20, so the "-l" argument is
-"1600,20,20,20,3". Finally, we stop the learning once our network has obtain at
-least 90% accuracy on the generalization set.
+"1600,20,20,20,3". Finally, we stop the learning once our network has obtained
+at least 90% accuracy on the generalization set.
 
 ```
-./trainBPN -d ../Example/threeShapes/data/threeShapes.csv -l 1600,20,20,20,3 -a 99 -e myTrainedNN
+./trainBPN -d ../Example/threeShapes/data/threeShapes.csv -l 1600,20,20,20,3 -a 90 -e myTrainedNN
 Input file: ../Example/threeShapes/data/threeShapes.csv
 Read complete: 100000 inputs loaded
 
@@ -131,7 +131,8 @@ export of a Neural Network on the standard input.
 ./gui -nn myTrainedNN -l Line,Rectangle,Triangle
 ```
 
-- Under __Windows__, this command will fail. You must start the X server manually, run the following commands prior to the one above.
+- Using __Cygwin__ under __Windows__, this command will fail. You must start
+  the X server manually, run the following commands prior to the one above.
      ```
      startxwin &
      export DISPLAY=:0.0
@@ -141,7 +142,7 @@ export of a Neural Network on the standard input.
 
 
 The grid on the left shows the state of the input neurons. Click on a square to
-change it's value. The neurons layers are displayed to the right. Last column
+change its value. The neurons layers are displayed to the right. Last column
 is the output layer. Labels for the output neurons may be specified using the
 ``-l`` argument.
 
