@@ -81,6 +81,11 @@ namespace BPN
           return m_neurons[layer][n].value;
         }
 
+      inline const std::string activationFunctionName() const
+        {
+          return m_sigma->serialize();
+        }
+
   private:
       void loadFromFile(const char* filename);
       void InitializeNetwork();

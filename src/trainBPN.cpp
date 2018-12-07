@@ -48,6 +48,7 @@ int main( int argc, char* argv[] )
   cmdParser.set_optional<std::string>( "i", "import", "", "Import neural network from file before training. ( \"-\" stands for stdin)" );
   cmdParser.set_optional<std::string>( "e", "export", "", "Export neural network to file after training. ( \"-\" stands for stdout)" );
 
+  cmdParser.set_optional<std::string>( "s", "activation", "Sigmoid(1)", "The actiation function. Available options are:\n     Sigmoid(k), logistic function with stepness ``k``.\n     ReLU,       rectified linear unit.");
   cmdParser.set_optional<uint32_t>( "m", "maxEpoch", 100, "Maximum num of iterations." );
   cmdParser.set_optional<double>( "r", "learningRate", 0.01, "Multiplicative coefficient on error gradient" );
   cmdParser.set_optional<double>( "mom", "momentum", 0.9, "Multiplicative coefficient applied on previous error delta when non using batch learning." );
@@ -61,16 +62,17 @@ int main( int argc, char* argv[] )
       return 1;
     }
 
-  std::string const trainingDataPath  = cmdParser.get<std::string>( "d" ).c_str();
-  std::string const layers            = cmdParser.get<std::string>( "l" );
-  std::string const importFile        = cmdParser.get<std::string>( "i" );
-  std::string const exportFile        = cmdParser.get<std::string>( "e" );
-  uint32_t const    maxEpoch          = cmdParser.get<uint32_t>( "m" );
-  double            learningRate      = cmdParser.get<double>( "r" );
-  double            momentum          = cmdParser.get<double>( "mom" );
-  bool              batchLearning     = cmdParser.get<bool>( "b" );
-  double            accuracy          = cmdParser.get<double>( "a" );
-  int32_t           verbosity         = cmdParser.get<int32_t>( "v" );
+  std::string const trainingDataPath   = cmdParser.get<std::string>( "d" ).c_str();
+  std::string const layers             = cmdParser.get<std::string>( "l" );
+  std::string const importFile         = cmdParser.get<std::string>( "i" );
+  std::string const exportFile         = cmdParser.get<std::string>( "e" );
+  std::string const activationFunction = cmdParser.get<std::string>( "s" );
+  uint32_t const    maxEpoch           = cmdParser.get<uint32_t>( "m" );
+  double            learningRate       = cmdParser.get<double>( "r" );
+  double            momentum           = cmdParser.get<double>( "mom" );
+  bool              batchLearning      = cmdParser.get<bool>( "b" );
+  double            accuracy           = cmdParser.get<double>( "a" );
+  int32_t           verbosity          = cmdParser.get<int32_t>( "v" );
 
   if ( layers.compare("[]") == 0 && importFile.compare("") == 0 )
     {
@@ -86,7 +88,8 @@ int main( int argc, char* argv[] )
 
   // Select activation function
   //
-  BPN::ActivationFunction* sigma = new BPN::Sigmoid();
+  BPN::ActivationFunction* sigma = BPN::ActivationFunction::deserialize( activationFunction );
+  //BPN::ActivationFunction* sigma = new BPN::Sigmoid();
   //BPN::ActivationFunction* sigma = new BPN::Sigmoid(2.0);
   //BPN::ActivationFunction* sigma = new BPN::ReLU();
 
@@ -133,7 +136,7 @@ int main( int argc, char* argv[] )
     }
   if ( verbosity >= 1 )
     {
-      std::cout << "Input file: " << trainingDataPath
+      std::cout << "Input data file: " << trainingDataPath
         << "\nRead complete: " << dataReader.getNumEnties()
         << " inputs loaded" << std::endl;
     }

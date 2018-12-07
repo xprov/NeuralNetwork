@@ -74,13 +74,12 @@ namespace BPN
           std::cout	<< std::endl << " Neural Network Training Starting: " << std::endl
             << "==========================================================================" 
             << std::endl
-            << " LR: " << m_learningRate 
+            << " Learning Rate: " << m_learningRate 
             << ", Momentum: " << m_momentum 
             << ", Max Epochs: " << m_maxEpochs << std::endl
-            << " " << m_pNetwork->m_numInputs 
-            << " Input Neurons, " << m_pNetwork->m_numLayers-2
-            << " Hidden Layers, " << m_pNetwork->m_numOutputs
-            << " Output Neurons" << std::endl
+            << " Target Accucaty: " << m_desiredAccuracy
+            << ", Layers Sizes: " << m_pNetwork->m_layerSizes << std::endl
+            << " Activation function: " << m_pNetwork->activationFunctionName() << std::endl
             << "==========================================================================" 
             << std::endl << std::endl;
         }

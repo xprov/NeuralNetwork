@@ -1,2 +1,7 @@
-1. Update documentation... ;-)
-2. Get rid of GooCanvas (obviously a bad choice)
+
+ - Update documentation... ;-)
+
+ - The activation function should specified in the arguements instead of being hardcoded ! 
+
+ - Get rid of GooCanvas (obviously a bad choice)
+
