@@ -14,6 +14,37 @@
 //-------------------------------------------------------------------------
 
 
+//std::vector<std::string> split(const std::string& t, const std::string& m)
+//{
+//  std::vector<std::string> splitted;
+//  std::size_t first = 0;
+//  std::size_t last = t.find( m );
+//  while ( last != std::string::npos )
+//    {
+//      splitted.push_back( t.substr( first, last-first ) );
+//      first = last + m.size();
+//      last = t.find( m, first );
+//    }
+//  splitted.push_back( t.substr( first, t.size() - first ) );
+//  return splitted;
+//}
+
+std::stringstream lineToStream(const std::string& t, const std::string& m)
+{
+  std::stringstream ss;
+  std::size_t first = 0;
+  std::size_t last = t.find( m );
+  while ( last != std::string::npos )
+    {
+      ss << t.substr( first, last-first ) << " ";
+      first = last + m.size();
+      last = t.find( m, first );
+    }
+  ss << t.substr( first, t.size() - first );
+  return ss;
+}
+
+
 namespace BPN
 {
     TrainingDataReader::TrainingDataReader( std::string const& filename, int32_t numInputs, int32_t numOutputs )
@@ -40,13 +71,33 @@ namespace BPN
 
             int32_t const totalValuesToRead = m_numInputs + m_numOutputs;
 
+            int i=0;
             while ( !inputFile.eof() )
             {
                 std::getline( inputFile, line );
+
+                // test split function
+                //std::vector<std::string> splitted = split( line, "," );
+                std::cout << "##############################################" << std::endl;;
+                std::stringstream ss = lineToStream(line, ",");;
+                double d;
+                while ( ss >> d )
+                  {
+                    std::cout << "# -->" << d << "<--" << std::endl;
+                  }
+                std::cout << "##############################################" << std::endl;;
+
+
+
                 if ( line.length() > 2 )
-                {
-                    m_entries.push_back( TrainingEntry() );
-                    TrainingEntry& entry = m_entries.back();
+                  {
+                    // line that starts with # are comments and thus ignored.
+                    if (line[0] == '#')
+                      continue;
+                    std::cout << "# --> " << line << "<--" << std::endl;
+
+                    TrainingEntry entry;
+                    m_entries.push_back( entry );
 
                     char cstr[line.size() + 1];
                     strncpy( cstr, line.c_str(), line.size() + 1);
@@ -60,22 +111,25 @@ namespace BPN
                     char* pToken = strtok( cstr, "," );
 
                     while ( pToken != nullptr && i < totalValuesToRead )
-                    {
+                      {
                         if ( i < m_numInputs )
-                        {
+                          {
                             entry.m_inputs.push_back( atof( pToken ) );
-                        }
+                          }
                         else
-                        {
+                          {
                             double const outputValue = atof( pToken );
                             entry.m_expectedOutputs.push_back( (int32_t) outputValue );
-                        }
+                          }
 
                         //pToken = strtok_r( nullptr, ",", &nextToken );
                         pToken = strtok( nullptr, ",");
                         i++;
-                    }
-                }
+                      }
+                  }
+                std::cout << "# input size : " << m_entries[i].m_inputs.size() << std::endl;
+                std::cout << "# ouput size : " << m_entries[i].m_expectedOutputs.size() << std::endl;
+                ++i;
             }
 
             inputFile.close();

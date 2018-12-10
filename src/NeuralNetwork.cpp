@@ -75,6 +75,9 @@ namespace BPN
 
   void Network::InitializeWeights()
     {
+      // TODO : function ``generator`` initializes a pseudo-random number
+      // generator. Here initialization is hard-coded at 0 for debug reasons
+      // (reproducabiblity is the key... right ?).
       std::random_device rd;
       //std::mt19937 generator( rd() );
       std::mt19937 generator( 0 );

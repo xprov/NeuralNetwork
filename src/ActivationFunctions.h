@@ -65,7 +65,7 @@ namespace BPN
         /**
          *                   1
          * f(x) =    -----------------
-         *           1 + exp(lambda*x)
+         *           1 + exp(-lambda*x)
          *
          * f'(x) = lambda * f(x) * (1-f(x))
          */
