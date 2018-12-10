@@ -100,7 +100,7 @@ namespace BPN
         const double lambda;
       };
 
-    class ReLU : public ActivationFunction 
+    class LeakyReLU : public ActivationFunction 
       {
         /**
          *                   1
@@ -108,6 +108,35 @@ namespace BPN
          *           1 + exp(lambda*x)
          *
          * f'(x) = lambda * f(x) * (1-f(x))
+         */
+      public:
+
+        LeakyReLU( ) { }
+
+        inline double evaluate( double x ) const
+          {
+            return (x > 0) ? x : 0.01*x;
+          }
+
+        inline double evalDerivative( double x, double fx = -1.0 ) const
+          {
+            (void) x; (void) fx;
+            return (x > 0) ? 1 : 0.01;
+          }
+
+        inline std::string serialize() const
+          {
+            return "ReLU";
+          }
+      };
+
+    class ReLU : public ActivationFunction 
+      {
+        /**
+         *           
+         * f(x) =  max(0,x);
+         *
+         * f'(x) = (x > 0) ? 1 : 0;
          */
       public:
 

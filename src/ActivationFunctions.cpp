@@ -16,7 +16,11 @@ namespace BPN {
             double lambda = atof( s.substr( 8, s.size() - 9 ).c_str() );
             return new Sigmoid(lambda);
           }
-        if ( s.find("ReLU") != std::string::npos )
+        else if ( s.find("LeakyReLU") != std::string::npos )
+          {
+            return new LeakyReLU();
+          }
+        else if ( s.find("ReLU") != std::string::npos )
           {
             return new ReLU();
           }

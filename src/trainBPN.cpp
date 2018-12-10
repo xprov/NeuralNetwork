@@ -43,12 +43,12 @@ int main( int argc, char* argv[] )
 
 
   cli::Parser cmdParser( argc, argv );
-  cmdParser.set_required<std::string>( "d", "dataFile", "Path to training data csv file." );
+  cmdParser.set_required<std::string>( "d", "dataFile", "Path to training data file." );
   cmdParser.set_optional<std::string>( "l", "layers", "[]", "Comma separated list of the layers sizes (e.g. 16,4,4,3 or 1,1,1).\n     First layer is the input neurons.\n     Last layer is the output layer." );
   cmdParser.set_optional<std::string>( "i", "import", "", "Import neural network from file before training. ( \"-\" stands for stdin)" );
   cmdParser.set_optional<std::string>( "e", "export", "", "Export neural network to file after training. ( \"-\" stands for stdout)" );
 
-  cmdParser.set_optional<std::string>( "s", "activation", "Sigmoid(1)", "The actiation function. Available options are:\n     Sigmoid(k), logistic function with stepness ``k``.\n     ReLU,       rectified linear unit.");
+  cmdParser.set_optional<std::string>( "s", "activation", "Sigmoid(1)", "The actiation function. Available options are:\n     Sigmoid(k), logistic function with stepness ``k``.\n     ReLU,       rectified linear unit.\n     LeakyReLY, Leaky ReLU, like ReLU but with small gradiant (1/100) when the unit is not active");
   cmdParser.set_optional<uint32_t>( "m", "maxEpoch", 100, "Maximum num of iterations." );
   cmdParser.set_optional<double>( "r", "learningRate", 0.01, "Multiplicative coefficient on error gradient" );
   cmdParser.set_optional<double>( "mom", "momentum", 0.9, "Multiplicative coefficient applied on previous error delta when non using batch learning." );

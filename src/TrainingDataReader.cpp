@@ -9,7 +9,6 @@
 #include <iosfwd>
 #include <algorithm>
 #include <iostream>
-#include <string.h>
 
 //-------------------------------------------------------------------------
 
@@ -29,7 +28,7 @@
 //  return splitted;
 //}
 
-std::stringstream lineToStream(const std::string& t, const std::string& m)
+std::stringstream listToStream(const std::string& t, const std::string& m)
 {
   std::stringstream ss;
   std::size_t first = 0;
@@ -47,133 +46,91 @@ std::stringstream lineToStream(const std::string& t, const std::string& m)
 
 namespace BPN
 {
-    TrainingDataReader::TrainingDataReader( std::string const& filename, int32_t numInputs, int32_t numOutputs )
-        : m_filename( filename )
-        , m_numInputs( numInputs )
-        , m_numOutputs( numOutputs )
+  TrainingDataReader::TrainingDataReader( std::string const& filename, int32_t numInputs, int32_t numOutputs )
+    : m_filename( filename ), m_numInputs( numInputs ), m_numOutputs( numOutputs )
+  {
+    assert( !filename.empty() && m_numInputs > 0 && m_numOutputs > 0 );
+  }
+
+  bool TrainingDataReader::ReadData()
     {
-        assert( !filename.empty() && m_numInputs > 0 && m_numOutputs > 0 );
-    }
+      assert( !m_filename.empty() );
 
-    bool TrainingDataReader::ReadData()
-    {
-        assert( !m_filename.empty() );
+      std::fstream inputFile;
+      inputFile.open( m_filename, std::ios::in );
 
-        std::fstream inputFile;
-        inputFile.open( m_filename, std::ios::in );
-
-        if ( inputFile.is_open() )
+      if ( inputFile.is_open() )
         {
-            std::string line;
+          std::string line;
 
-            // Read data
-            //-------------------------------------------------------------------------
-
-            int32_t const totalValuesToRead = m_numInputs + m_numOutputs;
-
-            int i=0;
-            while ( !inputFile.eof() )
+          while ( !inputFile.eof() )
             {
-                std::getline( inputFile, line );
+              std::getline( inputFile, line );
 
-                // test split function
-                //std::vector<std::string> splitted = split( line, "," );
-                std::cout << "##############################################" << std::endl;;
-                std::stringstream ss = lineToStream(line, ",");;
-                double d;
-                while ( ss >> d )
-                  {
-                    std::cout << "# -->" << d << "<--" << std::endl;
-                  }
-                std::cout << "##############################################" << std::endl;;
+              // line that starts with # are comments and thus ignored.
+              if (line[0] == '#')
+                continue;
 
+              m_entries.push_back( TrainingEntry() );
+              TrainingEntry& entry = m_entries.back();
 
-
-                if ( line.length() > 2 )
-                  {
-                    // line that starts with # are comments and thus ignored.
-                    if (line[0] == '#')
-                      continue;
-                    std::cout << "# --> " << line << "<--" << std::endl;
-
-                    TrainingEntry entry;
-                    m_entries.push_back( entry );
-
-                    char cstr[line.size() + 1];
-                    strncpy( cstr, line.c_str(), line.size() + 1);
-
-                    // Read values
-                    int i = 0;
-                    // Changes for compatibility with Cygwin. Does it breaks
-                    // anything ? I don't know !
-                    //char* nextToken = nullptr;
-                    //char* pToken = strtok_r( cstr, ",", &nextToken );
-                    char* pToken = strtok( cstr, "," );
-
-                    while ( pToken != nullptr && i < totalValuesToRead )
-                      {
-                        if ( i < m_numInputs )
-                          {
-                            entry.m_inputs.push_back( atof( pToken ) );
-                          }
-                        else
-                          {
-                            double const outputValue = atof( pToken );
-                            entry.m_expectedOutputs.push_back( (int32_t) outputValue );
-                          }
-
-                        //pToken = strtok_r( nullptr, ",", &nextToken );
-                        pToken = strtok( nullptr, ",");
-                        i++;
-                      }
-                  }
-                std::cout << "# input size : " << m_entries[i].m_inputs.size() << std::endl;
-                std::cout << "# ouput size : " << m_entries[i].m_expectedOutputs.size() << std::endl;
-                ++i;
+              std::stringstream ss = listToStream(line, ",");;
+              for ( int i=0; i < m_numInputs; ++i )
+                {
+                  double d;
+                  ss >> d;
+                  entry.m_inputs.push_back( d );
+                }
+              for ( int i=0; i < m_numInputs; ++i )
+                {
+                  int32_t x;
+                  ss >> x;
+                  entry.m_expectedOutputs.push_back( x );
+                }
             }
 
-            inputFile.close();
+          inputFile.close();
 
-            if ( !m_entries.empty() )
+          if ( !m_entries.empty() )
             {
-                CreateTrainingData();
+              CreateTrainingData();
             }
 
-            return true;
+          return true;
         }
-        else
+      else
         {
-            throw std::runtime_error("Error opening input file");
+          throw std::runtime_error("Error opening input file");
         }
     }
 
-    void TrainingDataReader::CreateTrainingData()
+  void TrainingDataReader::CreateTrainingData()
     {
-        assert( !m_entries.empty() );
+      assert( !m_entries.empty() );
 
-        std::random_shuffle( m_entries.begin(), m_entries.end() );
+      std::random_shuffle( m_entries.begin(), m_entries.end() );
 
-        // Training set
-        int32_t const numEntries = (int32_t) m_entries.size();
-        int32_t const numTrainingEntries  = (int32_t) ( 0.6 * numEntries );
-        int32_t const numGeneralizationEntries = (int32_t) ( ceil( 0.2 * numEntries ) );
+      // Training set
+      int32_t const numEntries = (int32_t) m_entries.size();
+      int32_t const numTrainingEntries  = (int32_t) ( 0.6 * numEntries );
+      int32_t const numGeneralizationEntries = (int32_t) ( ceil( 0.2 * numEntries ) );
 
-        int32_t entryIdx = 0;
-        for ( ; entryIdx < numTrainingEntries; entryIdx++ )
+      int32_t entryIdx = 0;
+      for ( ; entryIdx < numTrainingEntries; entryIdx++ )
         {
-            m_data.m_trainingSet.push_back( m_entries[entryIdx] );
+          m_data.m_trainingSet.push_back( m_entries[entryIdx] );
         }
 
-        // Generalization set
-        for ( ; entryIdx < numTrainingEntries + numGeneralizationEntries; entryIdx++ )
+      // Generalization set
+      for ( ; entryIdx < numTrainingEntries + numGeneralizationEntries; entryIdx++ )
         {
-            m_data.m_generalizationSet.push_back( m_entries[entryIdx] );
+          m_data.m_generalizationSet.push_back( m_entries[entryIdx] );
         }
 
-        // Validation set
-        for ( ; entryIdx < numEntries; entryIdx++ )
+      // Validation set
+      for ( ; entryIdx < numEntries; entryIdx++ )
         {
-            m_data.m_validationSet.push_back( m_entries[entryIdx] );
+          m_data.m_validationSet.push_back( m_entries[entryIdx] );
         }
     }
 }
