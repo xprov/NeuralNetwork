@@ -86,6 +86,11 @@ namespace BPN
           return m_sigma->serialize();
         }
 
+      inline const std::vector<int32_t>& getOutput() const
+        {
+          return m_clampedOutputs;
+        }
+
   private:
       void loadFromFile(const char* filename);
       void InitializeNetwork();

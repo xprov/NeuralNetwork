@@ -64,104 +64,141 @@ namespace BPN
     m_dataFormat( format ), 
     m_verbosity( verbosity )
   {
-    assert( !filename.empty() && m_numInputs > 0 && m_numOutputs > 0 );
+    assert( m_numInputs > 0 && m_numOutputs > 0 ); 
+    if ( m_filename.compare("-") == 0 )
+      {
+        m_dataStream = &std::cin;
+      }
+    else
+      {
+        // should be a valid filename
+        std::ifstream * tmp = new std::ifstream();
+        tmp->open( m_filename, std::ios::in );
+        if ( !tmp->is_open() )
+          throw std::runtime_error("Unable to read from input file");
+        m_dataStream = tmp;
+      }
   }
+
+  bool DataReader::readOneInputData( std::vector<double>& inputValues )
+    {
+      inputValues.clear();
+      std::string line;
+      std::getline( *m_dataStream, line );
+      if ( m_dataFormat == BPN::numberList )
+        {
+          std::stringstream ss;
+          insertListInStream( ss, line, "," );
+          for ( int i=0; i < m_numInputs; ++i )
+            {
+              double d;
+              ss >> d;
+              inputValues.push_back( d );
+            }
+        }
+      else // ( m_dataType == BPN::text )
+        {
+          std::vector<double> inputs;
+          textToListOfDouble( inputs, line );
+          int nbInputs = inputs.size();
+          for ( int i=0; i < std::min( nbInputs, m_numInputs ); ++i )
+            {
+              inputValues.push_back(inputs[i]);
+            }
+          for ( int i=0; i < m_numInputs - nbInputs; ++i )
+            {
+              inputValues.push_back(0.0);
+            }
+        }
+
+      if ( m_verbosity >= 2 )
+        {
+          std::cout << "  Input : " << inputValues << std::endl;
+        }
+      return true;
+    }
 
   bool DataReader::readTraningData( TrainingData& data )
     {
       std::vector<TrainingEntry> entries;
-      assert( !m_filename.empty() );
+      std::string line;
 
-      std::fstream inputFile;
-      inputFile.open( m_filename, std::ios::in );
-
-      if ( inputFile.is_open() )
+      while ( !m_dataStream->eof() )
         {
-          std::string line;
+          std::getline( *m_dataStream, line );
 
-          while ( !inputFile.eof() )
+          // line that starts with # are comments and thus ignored.
+          if (line[0] == '#' || line.size() == 0)
+            continue;
+
+          entries.push_back( TrainingEntry() );
+          TrainingEntry& entry = entries.back();
+
+          if ( m_dataFormat == BPN::numberList )
             {
-              std::getline( inputFile, line );
-
-              // line that starts with # are comments and thus ignored.
-              if (line[0] == '#' || line.size() == 0)
-                continue;
-
-              entries.push_back( TrainingEntry() );
-              TrainingEntry& entry = entries.back();
-
-              if ( m_dataFormat == BPN::numberList )
+              std::stringstream ss;
+              insertListInStream( ss, line, "," );
+              for ( int i=0; i < m_numInputs; ++i )
                 {
-                  std::stringstream ss;
-                  insertListInStream( ss, line, "," );
-                  for ( int i=0; i < m_numInputs; ++i )
-                    {
-                      double d;
-                      ss >> d;
-                      entry.m_inputs.push_back( d );
-                    }
-                  for ( int i=0; i < m_numInputs; ++i )
-                    {
-                      int32_t x;
-                      ss >> x;
-                      entry.m_expectedOutputs.push_back( x );
-                    }
+                  double d;
+                  ss >> d;
+                  entry.m_inputs.push_back( d );
                 }
-              else // ( m_dataType == BPN::text )
+              for ( int i=0; i < m_numInputs; ++i )
                 {
-                  if (line[0] != '"')
-                    {
-                      throw std::runtime_error("Bad training data file (must start by a text between \")");
-                    }
-                  std::size_t last = line.find_last_of( '"' );
-                  if (line[last+1] != ',')
-                    {
-                      throw std::runtime_error("Bad training data file (should be \"<text>\",<outputs>");
-                    }
-                  std::vector<double> inputs;
-                  textToListOfDouble( inputs, line.substr(1, last-1) );
-                  std::stringstream outputStream;
-                  insertListInStream( outputStream, line.substr(last+2, std::string::npos), ",");
-                  int nbInputs = inputs.size();
-                  for ( int i=0; i < std::min( nbInputs, m_numInputs ); ++i )
-                    {
-                      entry.m_inputs.push_back(inputs[i]);
-                    }
-                  for ( int i=0; i < m_numInputs - nbInputs; ++i )
-                    {
-                      entry.m_inputs.push_back(0);
-                    }
-                  for ( int i=0; i < m_numOutputs; ++i )
-                    {
-                      int32_t x;
-                      outputStream >> x;
-                      entry.m_expectedOutputs.push_back( x );
-                    }
+                  int32_t x;
+                  ss >> x;
+                  entry.m_expectedOutputs.push_back( x );
                 }
-
-              if ( m_verbosity >= 2 )
+            }
+          else // ( m_dataType == BPN::text )
+            {
+              if (line[0] != '"')
                 {
-                  std::cout << "  Input : " << entry.m_inputs << std::endl;
-                  std::cout << "  Output : " << entry.m_expectedOutputs << "\n" << std::endl;
-
+                  throw std::runtime_error("Bad training data file (must start by a text between \")");
                 }
-
-              assert( entry.m_inputs.size() == (uint32_t) m_numInputs );
-              assert( entry.m_expectedOutputs.size() == (uint32_t) m_numOutputs );
+              std::size_t last = line.find_last_of( '"' );
+              if (line[last+1] != ',')
+                {
+                  throw std::runtime_error("Bad training data file (should be \"<text>\",<outputs>");
+                }
+              std::vector<double> inputs;
+              textToListOfDouble( inputs, line.substr(1, last-1) );
+              std::stringstream outputStream;
+              insertListInStream( outputStream, line.substr(last+2, std::string::npos), ",");
+              int nbInputs = inputs.size();
+              for ( int i=0; i < std::min( nbInputs, m_numInputs ); ++i )
+                {
+                  entry.m_inputs.push_back(inputs[i]);
+                }
+              for ( int i=0; i < m_numInputs - nbInputs; ++i )
+                {
+                  entry.m_inputs.push_back(0.0);
+                }
+              for ( int i=0; i < m_numOutputs; ++i )
+                {
+                  int32_t x;
+                  outputStream >> x;
+                  entry.m_expectedOutputs.push_back( x );
+                }
             }
 
-          inputFile.close();
-
-          if ( !entries.empty() )
+          if ( m_verbosity >= 2 )
             {
-              CreateTrainingData(data, entries);
+              std::cout << "  Input : " << entry.m_inputs << std::endl;
+              std::cout << "  Output : " << entry.m_expectedOutputs << "\n" << std::endl;
+
             }
-          return true;
+
+          assert( entry.m_inputs.size() == (uint32_t) m_numInputs );
+          assert( entry.m_expectedOutputs.size() == (uint32_t) m_numOutputs );
         }
-      else
+
+      if ( !entries.empty() )
         {
-          throw std::runtime_error("Error opening input file");
+          CreateTrainingData(data, entries);
         }
+      return true;
     }
 
 

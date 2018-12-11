@@ -6,6 +6,9 @@ SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g" )
 ADD_EXECUTABLE( trainBPN trainBPN.cpp NeuralNetwork.cpp NeuralNetworkTrainer.cpp
     DataReader.cpp Matrix.cpp ActivationFunctions.cpp )
 
+# Add an executable compiled from evalNN.cpp
+ADD_EXECUTABLE( evalNN evalNN.cpp NeuralNetwork.cpp DataReader.cpp ActivationFunctions.cpp Matrix.cpp )
+
 # Use the package PkgConfig to detect GTK+ headers/library files
 FIND_PACKAGE(PkgConfig REQUIRED)
 PKG_CHECK_MODULES(GTK2 REQUIRED gtk+-2.0)
