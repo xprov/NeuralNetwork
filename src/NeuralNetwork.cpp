@@ -13,6 +13,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <math.h>
 
 #include "NeuralNetwork.h"
 
@@ -79,8 +80,8 @@ namespace BPN
       // generator. Here initialization is hard-coded at 0 for debug reasons
       // (reproducabiblity is the key... right ?).
       std::random_device rd;
-      //std::mt19937 generator( rd() );
-      std::mt19937 generator( 0 );
+      std::mt19937 generator( rd() );
+      //std::mt19937 generator( 0 );
 
       // TODO set distributionRangeHalfWidth for each layer, replace m_numInputs
       // by the number of neurons on the previous layer
@@ -146,12 +147,21 @@ namespace BPN
               for ( int32_t prevIdx = 0; prevIdx <= m_layerSizes[i-1]; ++prevIdx )
                 {
                   activation += m_neurons[i-1][prevIdx].value * m_weightsByLayer[i-1](prevIdx, actualIdx);
-                  //std::cout << "layer=" << i << ", actualIdx" << actualIdx << ", prevIdx=" << prevIdx << ", activation = " << m_neurons[i-1][prevIdx].value << " * " << m_weightsByLayer[i-1](prevIdx, actualIdx) << std::endl;
+                  //std::cout << "layer=" << i 
+                  //  << ", actualIdx" << actualIdx 
+                  //  << ", prevIdx=" << prevIdx 
+                  //  << ", activation = " << m_neurons[i-1][prevIdx].value 
+                  //  << " * " << m_weightsByLayer[i-1](prevIdx, actualIdx) << std::endl;
                 }
 
               // Apply activation function
               m_neurons[i][actualIdx].activation = activation;
               m_neurons[i][actualIdx].value = m_sigma->evaluate( activation );
+
+              if (std::isnan( m_neurons[i][actualIdx].value ))
+                {
+                  throw std::runtime_error("Training failed. Seem like weights diverged toward infinity");
+                }
 
               // If this is the output layer (the last layer), then update
               // clamped outputs

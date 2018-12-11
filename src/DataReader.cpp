@@ -46,7 +46,7 @@ void textToListOfDouble( std::vector<double>& l, const std::string& s)
 {
   for ( uint32_t i=0; i<s.size(); ++i )
     {
-      l.push_back((double)s[i]);
+      l.push_back( ((double)s[i]) / 256.0);
     }
 }
 
@@ -139,7 +139,7 @@ namespace BPN
                     }
                 }
 
-              if ( m_verbosity >= 3 )
+              if ( m_verbosity >= 2 )
                 {
                   std::cout << "  Input : " << entry.m_inputs << std::endl;
                   std::cout << "  Output : " << entry.m_expectedOutputs << "\n" << std::endl;

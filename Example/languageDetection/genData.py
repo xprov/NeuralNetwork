@@ -40,7 +40,6 @@ if __name__ == '__main__':
     vocabulary = extractVocabulary(sentences)
     for s in sentences:
         print('"{}",1'.format(s))
-    for i in range(n):
         print('"{}",0'.format(genGibberish(vocabulary, averageLength)))
 
 

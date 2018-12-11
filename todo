@@ -7,3 +7,7 @@
 
  - Add parameters of the size of Training/Generalization/Validation sets, instead of the hardcoded 60/20/20 %
 
+ - Add parameter for the seed of the random number generator used to initialize weights
+ 
+ - Add parameter for the way weights are initialized
+
