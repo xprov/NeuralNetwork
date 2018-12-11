@@ -40,12 +40,14 @@ if __name__ == '__main__':
     filename = sys.argv[1] # database of sentences
     sentences = readSentences(filename)
     n = len(sentences)
+    minLength = min(map(len, sentences))
+    maxLength = max(map(len, sentences))
     averageLength = sum(map(len, sentences)) // n
     vocabulary = extractVocabulary(sentences)
     for s in sentences:
         print('"{}",1,1'.format(s))
         print('"{}",0,1'.format(genGibberish(vocabulary, averageLength)))
-        print('"{}",0,0'.format(randomSequence(averageLength)))
+        print('"{}",0,0'.format(randomSequence(random.randint(minLength, maxLength))))
 
 
 
