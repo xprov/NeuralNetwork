@@ -5,3 +5,5 @@
 
  - Get rid of GooCanvas (obviously a bad choice)
 
+ - Add parameters of the size of Training/Generalization/Validation sets, instead of the hardcoded 60/20/20 %
+

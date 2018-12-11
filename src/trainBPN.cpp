@@ -146,7 +146,12 @@ int main( int argc, char* argv[] )
       std::cout << *nn << std::endl;
     }
 
-  BPN::DataReader dataReader( trainingDataPath, nn->getNumInputs(), nn->getNumOutputs(), inputDataFormat );
+  BPN::DataReader dataReader( trainingDataPath, 
+                             nn->getNumInputs(), 
+                             nn->getNumOutputs(), 
+                             inputDataFormat, 
+                             verbosity );
+
   BPN::TrainingData data;
   if ( !dataReader.readTraningData( data ) )
     {

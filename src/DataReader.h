@@ -27,7 +27,8 @@ namespace BPN
     DataReader( std::string const& filename, 
                 int32_t numInputs, 
                 int32_t numOutputs,
-                InputDataFormat dataType );
+                InputDataFormat dataType,
+                int verbosity );
 
 
 
@@ -47,5 +48,6 @@ namespace BPN
     int32_t                         m_numInputs;
     int32_t                         m_numOutputs;
     InputDataFormat                 m_dataFormat;
+    int32_t                         m_verbosity;
     };
 }

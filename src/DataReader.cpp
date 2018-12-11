@@ -56,8 +56,13 @@ namespace BPN
   DataReader::DataReader( std::string const& filename, 
                           int32_t numInputs, 
                           int32_t numOutputs,
-                          BPN::InputDataFormat format )
-    : m_filename( filename ), m_numInputs( numInputs ), m_numOutputs( numOutputs ), m_dataFormat( format )
+                          BPN::InputDataFormat format,
+                          int32_t verbosity )
+    : m_filename( filename ), 
+    m_numInputs( numInputs ), 
+    m_numOutputs( numOutputs ), 
+    m_dataFormat( format ), 
+    m_verbosity( verbosity )
   {
     assert( !filename.empty() && m_numInputs > 0 && m_numOutputs > 0 );
   }
@@ -132,6 +137,13 @@ namespace BPN
                       outputStream >> x;
                       entry.m_expectedOutputs.push_back( x );
                     }
+                }
+
+              if ( m_verbosity >= 3 )
+                {
+                  std::cout << "  Input : " << entry.m_inputs << std::endl;
+                  std::cout << "  Output : " << entry.m_expectedOutputs << "\n" << std::endl;
+
                 }
 
               assert( entry.m_inputs.size() == (uint32_t) m_numInputs );
