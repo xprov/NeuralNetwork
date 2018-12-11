@@ -32,6 +32,10 @@ def genGibberish(vocabulary, expectedLenght):
         word = random.choice(vocabulary)
     return " ".join(words)
 
+def randomSequence(expectedLenght):
+    s =  "".join((random.choice("    abcdefghijklmnopqrstuvwxyz") for i in range(expectedLenght)))
+    return s[0].upper() + s[1:]
+
 if __name__ == '__main__':
     filename = sys.argv[1] # database of sentences
     sentences = readSentences(filename)
@@ -39,8 +43,9 @@ if __name__ == '__main__':
     averageLength = sum(map(len, sentences)) // n
     vocabulary = extractVocabulary(sentences)
     for s in sentences:
-        print('"{}",1'.format(s))
-        print('"{}",0'.format(genGibberish(vocabulary, averageLength)))
+        print('"{}",1,1'.format(s))
+        print('"{}",0,1'.format(genGibberish(vocabulary, averageLength)))
+        print('"{}",0,0'.format(randomSequence(averageLength)))
 
 
 
