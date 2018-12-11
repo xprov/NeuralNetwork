@@ -4,7 +4,7 @@ SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}" )
 SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g" ) 
 
 ADD_EXECUTABLE( trainBPN trainBPN.cpp NeuralNetwork.cpp NeuralNetworkTrainer.cpp
-    TrainingDataReader.cpp Matrix.cpp ActivationFunctions.cpp )
+    DataReader.cpp Matrix.cpp ActivationFunctions.cpp )
 
 # Use the package PkgConfig to detect GTK+ headers/library files
 FIND_PACKAGE(PkgConfig REQUIRED)

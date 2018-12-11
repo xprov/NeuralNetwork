@@ -63,7 +63,7 @@ namespace BPN
 
       inline int32_t getNumOutputs() const
         {
-          return m_numInputs;
+          return m_numOutputs;
         }
 
       inline int32_t getNumLayers() const

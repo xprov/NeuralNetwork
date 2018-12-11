@@ -12,7 +12,7 @@
 #include <assert.h>
 
 #include "NeuralNetworkTrainer.h"
-#include "TrainingDataReader.h"
+#include "DataReader.h"
 #include "Matrix.h"
 #include "vectorstream.h"
 
@@ -35,7 +35,6 @@ using BPN::operator>>;
 
 int main( int argc, char* argv[] )
 {
-
   //BPN::Network nin( std::cin );
   //std::cout << nin << std::endl;
   //exit(0);
@@ -44,11 +43,25 @@ int main( int argc, char* argv[] )
 
   cli::Parser cmdParser( argc, argv );
   cmdParser.set_required<std::string>( "d", "dataFile", "Path to training data file." );
+  cmdParser.set_optional<std::string>( "f", "format", "numberList", "Format of the training data file.\n"
+                                 "     numberList, Comma separated list of numbers. The first ones are the\n"
+                                 "                 values of the input nodes and the following ones are the\n"
+                                 "                 expected values of the output nodes. The number of values\n"
+                                 "                 must fit the number of intput/output nodes.\n"
+                                 "     text,       Format is \"<text>\",<expectedOutput> where the expected\n"
+                                 "                 output is given a comma separated list of integers. Size of\n"
+                                 "                 the inputs may not equal the number of input nodes. If less\n"
+                                 "                 then extra zeros are added. If more, extra characters are\n"
+                                 "                 ignored.");
   cmdParser.set_optional<std::string>( "l", "layers", "[]", "Comma separated list of the layers sizes (e.g. 16,4,4,3 or 1,1,1).\n     First layer is the input neurons.\n     Last layer is the output layer." );
   cmdParser.set_optional<std::string>( "i", "import", "", "Import neural network from file before training. ( \"-\" stands for stdin)" );
   cmdParser.set_optional<std::string>( "e", "export", "", "Export neural network to file after training. ( \"-\" stands for stdout)" );
 
-  cmdParser.set_optional<std::string>( "s", "activation", "Sigmoid(1)", "The actiation function. Available options are:\n     Sigmoid(k), logistic function with stepness ``k``.\n     ReLU,       rectified linear unit.\n     LeakyReLY, Leaky ReLU, like ReLU but with small gradiant (1/100) when the unit is not active");
+  cmdParser.set_optional<std::string>( "s", "activation", "Sigmoid(1)", "The actiation function. Available options are:\n"
+                                 "     Sigmoid(k), Logistic function with stepness ``k``.\n"
+                                 "     ReLU,       Rectified linear unit.\n"
+                                 "     LeakyReLY,  Leaky ReLU, like ReLU but with small gradiant (1/100)\n"
+                                 "                 when the unit is not active.");
   cmdParser.set_optional<uint32_t>( "m", "maxEpoch", 100, "Maximum num of iterations." );
   cmdParser.set_optional<double>( "r", "learningRate", 0.01, "Multiplicative coefficient on error gradient" );
   cmdParser.set_optional<double>( "mom", "momentum", 0.9, "Multiplicative coefficient applied on previous error delta when non using batch learning." );
@@ -62,7 +75,8 @@ int main( int argc, char* argv[] )
       return 1;
     }
 
-  std::string const trainingDataPath   = cmdParser.get<std::string>( "d" ).c_str();
+  std::string const trainingDataPath   = cmdParser.get<std::string>( "d" );
+  std::string const format             = cmdParser.get<std::string>( "f" );
   std::string const layers             = cmdParser.get<std::string>( "l" );
   std::string const importFile         = cmdParser.get<std::string>( "i" );
   std::string const exportFile         = cmdParser.get<std::string>( "e" );
@@ -86,12 +100,16 @@ int main( int argc, char* argv[] )
       exit(1);
     }
 
-  // Select activation function
-  //
+  BPN::InputDataFormat inputDataFormat;
+  if ( format.compare("numberList") == 0 )
+    inputDataFormat = BPN::numberList;
+  else if ( format.compare("text") == 0 )
+    inputDataFormat = BPN::text;
+  else
+    throw std::runtime_error("Invalid format for input data. For more help use --help or -h.");
+
+  // Load activation function
   BPN::ActivationFunction* sigma = BPN::ActivationFunction::deserialize( activationFunction );
-  //BPN::ActivationFunction* sigma = new BPN::Sigmoid();
-  //BPN::ActivationFunction* sigma = new BPN::Sigmoid(2.0);
-  //BPN::ActivationFunction* sigma = new BPN::ReLU();
 
   // Create neural network
   BPN::Network* nn = NULL;;
@@ -128,17 +146,26 @@ int main( int argc, char* argv[] )
       std::cout << *nn << std::endl;
     }
 
-
-  BPN::TrainingDataReader dataReader( trainingDataPath, nn->getNumInputs(), nn->getNumOutputs() );
-  if ( !dataReader.ReadData() )
+  BPN::DataReader dataReader( trainingDataPath, nn->getNumInputs(), nn->getNumOutputs(), inputDataFormat );
+  BPN::TrainingData data;
+  if ( !dataReader.readTraningData( data ) )
     {
       return 1;
     }
   if ( verbosity >= 1 )
     {
-      std::cout << "Input data file: " << trainingDataPath
-        << "\nRead complete: " << dataReader.getNumEnties()
-        << " inputs loaded" << std::endl;
+      int nbTraining = data.m_trainingSet.size();
+      int nbGeneralization = data.m_generalizationSet.size();
+      int nbValidation = data.m_validationSet.size();
+      std::cout << " Training data read successfully:\n";
+      std::cout << "==========================================================================\n"
+        << " Input data file: " << trainingDataPath << "\n"
+        << " Read complete: " << nbTraining + nbGeneralization + nbValidation << " inputs loaded" 
+        << " (" << nbTraining << " for training, "
+        << nbGeneralization << " for generalization and " 
+        << nbValidation << " for validation)\n"
+        << "==========================================================================" 
+        << std::endl;
     }
 
 
@@ -152,7 +179,7 @@ int main( int argc, char* argv[] )
   trainerSettings.m_verbosity = verbosity;
 
   BPN::NetworkTrainer trainer( trainerSettings, nn );
-  trainer.Train( dataReader.getTrainingData() );
+  trainer.Train( data );
   if ( verbosity >= 2) 
     {
       std::cout << *nn << std::endl;
