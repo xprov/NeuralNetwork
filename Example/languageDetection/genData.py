@@ -30,7 +30,7 @@ def genGibberish(vocabulary, expectedLenght):
         words.append(word)
         length += len(word)
         word = random.choice(vocabulary)
-    return " ".join(words) + "."
+    return " ".join(words)
 
 if __name__ == '__main__':
     filename = sys.argv[1] # database of sentences
