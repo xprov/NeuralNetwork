@@ -101,11 +101,11 @@ namespace BPN
 
           if ( m_verbosity >= 1 )
             {
-              std::cout << std::setprecision(6)
-                << "Epoch :" << m_currentEpoch
-                << " Training Set Accuracy:" << m_trainingSetAccuracy 
+              std::cout << std::fixed << std::setprecision(6)
+                << "Epoch: " << m_currentEpoch
+                << " Training Set Accuracy: " << m_trainingSetAccuracy 
                 << "%, MSE: " << m_trainingSetMSE
-                << " Generalization Set Accuracy:" << m_generalizationSetAccuracy 
+                << ". Generalization Set Accuracy:" << m_generalizationSetAccuracy 
                 << "%, MSE: " << m_generalizationSetMSE << std::endl;
             }
 
