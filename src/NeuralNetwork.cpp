@@ -86,9 +86,8 @@ namespace BPN
 
       // Let N be the number of neurons in a given layer. 
       // Weights for this layer are set to normally distributed random values between [-2.4/N, 2.4/N].
-      // In the third loop, ``m_weightsByLayer[i](j,k)`` is the $w^i_{j,k}$ that
-      // is the weight from the j-th neuron on layer i to the k-th neuron on
-      // layer i+1.
+      // In the third loop, ``m_weightsByLayer[i](j,k)`` is the weight from the
+      // j-th neuron on layer i to the k-th neuron on layer i+1.
       for ( int32_t i=0; i<m_numLayers-1; ++i) 
         {
 
