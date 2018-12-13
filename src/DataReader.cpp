@@ -211,8 +211,8 @@ namespace BPN
 
       // Training set
       int32_t const numEntries = (int32_t) entries.size();
-      int32_t const numTrainingEntries  = (int32_t) ( 0.6 * numEntries );
-      int32_t const numGeneralizationEntries = (int32_t) ( ceil( 0.2 * numEntries ) );
+      int32_t const numTrainingEntries  = (int32_t) ( 0.8 * numEntries );
+      int32_t const numGeneralizationEntries = (int32_t) ( ceil( 0.1 * numEntries ) );
 
       int32_t entryIdx = 0;
       for ( ; entryIdx < numTrainingEntries; entryIdx++ )

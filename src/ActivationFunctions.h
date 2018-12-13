@@ -52,6 +52,9 @@ namespace BPN
             return 0.0;
           }
 
+        /**
+         * Representation of the function as text.
+         */
         virtual std::string serialize() const
           {
             return NULL;
@@ -100,41 +103,11 @@ namespace BPN
         const double lambda;
       };
 
-    class LeakyReLU : public ActivationFunction 
-      {
-        /**
-         *                   1
-         * f(x) =    -----------------
-         *           1 + exp(lambda*x)
-         *
-         * f'(x) = lambda * f(x) * (1-f(x))
-         */
-      public:
-
-        LeakyReLU( ) { }
-
-        inline double evaluate( double x ) const
-          {
-            return (x > 0) ? x : 0.01*x;
-          }
-
-        inline double evalDerivative( double x, double fx = -1.0 ) const
-          {
-            (void) x; (void) fx;
-            return (x > 0) ? 1 : 0.01;
-          }
-
-        inline std::string serialize() const
-          {
-            return "ReLU";
-          }
-      };
-
     class ReLU : public ActivationFunction 
       {
         /**
          *           
-         * f(x) =  max(0,x);
+         * f(x) =  max(x,0);
          *
          * f'(x) = (x > 0) ? 1 : 0;
          */
@@ -148,7 +121,7 @@ namespace BPN
             return (x>0) ? x : 0;
           }
 
-        inline double evalDerivative( double x, double fx = -1.0 ) const
+        inline double evalDerivative( double x, double fx ) const
           {
             (void) x; (void) fx;
             return (x > 0) ? 1 : 0;
@@ -157,6 +130,36 @@ namespace BPN
         inline std::string serialize() const
           {
             return "ReLU";
+          }
+      };
+
+    class LeakyReLU : public ActivationFunction 
+      {
+        /**
+         * Like ReLU but in case of a negative input x, then the ouput is x/100
+         * instead of 0.
+         *
+         * The idea is that a negative input is almost 0 but it still have a
+         * non-nul derivative.
+         */
+      public:
+
+        LeakyReLU( ) { }
+
+        inline double evaluate( double x ) const
+          {
+            return (x > 0) ? x : 0.01*x;
+          }
+
+        inline double evalDerivative( double x, double fx ) const
+          {
+            (void) x; (void) fx;
+            return (x > 0) ? 1 : 0.01;
+          }
+
+        inline std::string serialize() const
+          {
+            return "LeakyReLU";
           }
       };
 

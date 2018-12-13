@@ -7,7 +7,7 @@ def readSentences(filename):
     sentences = list()
     f = open(filename, 'r')
     for line in f.readlines():
-        sentences.append(line[:-1])
+        sentences.append(line[:-1].lower())
     return sentences
 
 def extractVocabulary(sentences):
@@ -23,7 +23,7 @@ def extractVocabulary(sentences):
 
 def genGibberish(vocabulary, expectedLenght):
     word = random.choice(vocabulary)
-    words = [ word[0].upper() + word[1:] ]
+    words = [ word ]
     length = len(word)
     word = random.choice(vocabulary)
     while length + len(word) < expectedLenght:
@@ -33,8 +33,7 @@ def genGibberish(vocabulary, expectedLenght):
     return " ".join(words)
 
 def randomSequence(expectedLenght):
-    s =  "".join((random.choice("    abcdefghijklmnopqrstuvwxyz") for i in range(expectedLenght)))
-    return s[0].upper() + s[1:]
+    return "".join((random.choice("    abcdefghijklmnopqrstuvwxyz") for i in range(expectedLenght)))
 
 if __name__ == '__main__':
     filename = sys.argv[1] # database of sentences

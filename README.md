@@ -47,23 +47,23 @@ might be uselessly complicated. If you know a better way, please let me know.
 
 1. Install Cygwin, go to [https://cygwin.com/install.html](https://cygwin.com/install.html) and download [setup-x86_64.exe](https://cygwin.com/setup-x86_64.exe).
 
-2. Run __setup-x86_64.exe__ and click __next__, __next__, __next__, until you get to the package selection page. In this page, use the __search__ box in order to select the following packages for installation:
+2. Run __setup-x86_64.exe__ and click __next__, __next__, __next__, until you get to the package selection page. In this page, use the __search__ box in order to select the following packages for installation (be carefull to select only those with the exact same name):
      - In __devel__ 
          - gcc-g++
          - make
          - cmake
          - git
-     - In __lib__
+     - In __libs__
          - libgtk2.0_0
-         - libgtk2.0_devel
-         - libgoocanvas_devel
+         - libgtk2.0-devel
+         - libgoocanvas-devel
      - In __X11__
          - xinit
          - xorg-server
 
     Once all packages are selected, click on __next__ the install process should start. You now have enough time to grab a coffee. Once installation is completed, you may exit the installer. 
 
-3. Launch the __Cygwin prompt__, an icon should have been created on your desktop. Congratulations, you now have something that looks like a real terminal !
+3. Launch the __Cygwin terminal__, an icon should have been created on your desktop. Congratulations, you now have something that looks like a real terminal !
 
 4. Get the files from Github, enter the following command:
     ```
@@ -158,6 +158,44 @@ Here are some examples :
 ![triangle detection](https://github.com/xprov/NeuralNetwork/blob/master/images/detectTriangle.png)
 
 
+
+# Basic customization
+
+To Build a Neural Network requires many choices. For a neophyte, many of these
+choices may seem arbitrary. The whole point of this project is to allow the
+user to test different choices.
+
+### New activation functions
+
+The addition of a new activation function requires 3 steps:
+
+ - In file __src/ActivationFunctions.h__ each activation function is
+   implemented as a class that inherits from class ``ActivationFunction``.
+   There are three functions to override : 
+     - ``double evaluate( double x )`` which computed the activation function for an input ``x``.
+     - ``double evalDerivative( double x, double fx )`` which computed the
+       derivative of the function for an input ``x``. Note that a second
+       parameter ``fx`` is specified, this parameter is the value of the activation
+       function for input ``x`` (not used in general but it does speed up the
+       computation in certain cases).
+     - ``std::string serialize()`` returns a string that represents the function.
+
+    __Copy__ one of the existing subclasses, __rename__ it and __update__ the three
+    abovementioned functions.
+
+ - In file __src/ActivationFunctions.cpp__ update function ``deserialize(const std::string& s)``. 
+   This function is the inverse of ``serialize``, it parses a string in order
+   return the corresponding activation function.
+
+ - In file __src/trainBPN.cpp__ at the beginning of the ``main`` function,
+   update the documentation string for optional parameter "``s``" consequently
+   to what you have done.
+
+
+### Modify weights initialization
+
+When building a new neural networks, random weights are generated in function
+``Network::InitializeWeights()`` found in file __src/NeuralNetwork.cpp__. 
 
 
 

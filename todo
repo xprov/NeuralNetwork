@@ -1,11 +1,11 @@
+ - Get rid of GooCanvas for the GUI (obviously a bad choice)
 
  - Update documentation... ;-)
+    - Add step by step instructions to compile on MAC
+    - Add step by step instructions to add a new activation function
+    - Add step by step instructions update initialization process
 
- - The activation function should specified in the arguements instead of being hardcoded ! 
-
- - Get rid of GooCanvas (obviously a bad choice)
-
- - Add parameters of the size of Training/Generalization/Validation sets, instead of the hardcoded 60/20/20 %
+ - Add parameters of the size of Training/Generalization/Validation sets, instead of the hardcoded 80/10/10 %
 
  - Add parameter for the seed of the random number generator used to initialize weights
  

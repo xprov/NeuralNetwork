@@ -83,13 +83,12 @@ namespace BPN
       std::mt19937 generator( rd() );
       //std::mt19937 generator( 0 );
 
-      // TODO set distributionRangeHalfWidth for each layer, replace m_numInputs
-      // by the number of neurons on the previous layer
-      //double const distributionRangeHalfWidth = ( 2.4 / m_numInputs );
-      //double const standardDeviation = distributionRangeHalfWidth * 2 / 6;
-      //std::normal_distribution<> normalDistribution( 0, standardDeviation );
 
-      // Set weights to normally distributed random values between [-2.4 / numInputs, 2.4 / numInputs]
+      // Let N be the number of neurons in a given layer. 
+      // Weights for this layer are set to normally distributed random values between [-2.4/N, 2.4/N].
+      // In the third loop, ``m_weightsByLayer[i](j,k)`` is the $w^i_{j,k}$ that
+      // is the weight from the j-th neuron on layer i to the k-th neuron on
+      // layer i+1.
       for ( int32_t i=0; i<m_numLayers-1; ++i) 
         {
 
