@@ -1,107 +1,3 @@
-// ************************ Drag and drop ***************** //
-let dropArea = document.getElementById("drop-area")
-
-// Prevent default drag behaviors
-;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-  dropArea.addEventListener(eventName, preventDefaults, false)   
-  document.body.addEventListener(eventName, preventDefaults, false)
-})
-
-// Highlight drop area when item is dragged over it
-;['dragenter', 'dragover'].forEach(eventName => {
-  dropArea.addEventListener(eventName, highlight, false)
-})
-
-;['dragleave', 'drop'].forEach(eventName => {
-  dropArea.addEventListener(eventName, unhighlight, false)
-})
-
-// Handle dropped files
-dropArea.addEventListener('drop', handleDrop, false)
-
-function preventDefaults (e) {
-  e.preventDefault()
-  e.stopPropagation()
-}
-
-function highlight(e) {
-  dropArea.classList.add('highlight')
-}
-
-function unhighlight(e) {
-  dropArea.classList.remove('active')
-}
-
-function handleDrop(e) {
-  var dt = e.dataTransfer
-  var files = dt.files
-
-  handleFiles(files)
-}
-
-let uploadProgress = []
-let progressBar = document.getElementById('progress-bar')
-
-function initializeProgress(numFiles) {
-  progressBar.value = 0
-  uploadProgress = []
-
-  for(let i = numFiles; i > 0; i--) {
-    uploadProgress.push(0)
-  }
-}
-
-function updateProgress(fileNumber, percent) {
-  uploadProgress[fileNumber] = percent
-  let total = uploadProgress.reduce((tot, curr) => tot + curr, 0) / uploadProgress.length
-  console.debug('update', fileNumber, percent, total)
-  progressBar.value = total
-}
-
-function handleFiles(files) {
-  files = [...files]
-  initializeProgress(files.length)
-  files.forEach(uploadFile)
-  files.forEach(previewFile)
-}
-
-function previewFile(file) {
-  let reader = new FileReader()
-  reader.readAsDataURL(file)
-  reader.onloadend = function() {
-    let img = document.createElement('img')
-    img.src = reader.result
-    document.getElementById('gallery').appendChild(img)
-  }
-}
-
-function uploadFile(file, i) {
-  var url = 'https://api.cloudinary.com/v1_1/joezimim007/image/upload'
-  var xhr = new XMLHttpRequest()
-  var formData = new FormData()
-  xhr.open('POST', url, true)
-  xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
-
-  // Update progress (can be used to show progress indicator)
-  xhr.upload.addEventListener("progress", function(e) {
-    updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
-  })
-
-  xhr.addEventListener('readystatechange', function(e) {
-    if (xhr.readyState == 4 && xhr.status == 200) {
-      updateProgress(i, 100) // <- Add this
-    }
-    else if (xhr.readyState == 4 && xhr.status != 200) {
-      // Error. Inform the user
-    }
-  })
-
-  formData.append('upload_preset', 'ujpu6gyk')
-  formData.append('file', file)
-  xhr.send(formData)
-}
-
-
 /**
  * Fully Connected Neural Network
  */
@@ -196,24 +92,23 @@ class FCNN {
    * consequently.
    */
   evaluate(input) {
+
     // update input neurons
     for (var i=0; i<this.layers[0]; i++) {
       this.neurons[0][i] = input[i];
     }
+
     // update all other layers
     for (var k=1; k<this.numLayers; k++) {
       for (var j=0; j<this.layers[k]; j++) {
         var activation = 0.0;
         for (var i=0; i<=this.layers[k-1]; i++) {
-          //console.log("Layer=" + k
-          //  + ", actualIdx=" + j
-          //  + ", prevIdx=" + i
-          //  + ", activation=" + this.neurons[k-1][i] + " * "  + this.weights[k-1][i][j]);
           activation += this.neurons[k-1][i] * this.weights[k-1][i][j];
         }
         this.neurons[k][j] = this.activationFunction(activation);
       }
     }
+
     return this.getOutput();
   }
 
@@ -250,7 +145,7 @@ function importFCNN() {
   } catch (err) {
     document.getElementById("fcnn-display-area").innerHTML = "Erreur à l'importation, réseau invalide. (" + err + ")";
   }
-  console.log(fcnn);
+  //console.log(fcnn);
 }
 
 /**
@@ -288,9 +183,11 @@ inputValues.addEventListener("keyup", function(event) {
     // Cancel the default action, if needed
     event.preventDefault();
     // Trigger the button element with a click
-    document.getElementById("importFCNN").click();
+    document.getElementById("importButton").click();
   }
 }); 
+
+
 
 
 // Pressing the ENTER key in the input box will trigger the 'Load and evaluate'
@@ -306,4 +203,7 @@ inputValues.addEventListener("keyup", function(event) {
     document.getElementById("evaluateButton").click();
   }
 }); 
+
+
+
 

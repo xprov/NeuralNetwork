@@ -2,7 +2,7 @@
 <head>
   <title> Réseaux de neuronnes </title>
   <meta charset="UTF-8">
-  <link rel="stylesheet" href="tuto.css">
+  <link rel="stylesheet" href="fcnn.css">
 </head>
 
 
@@ -13,21 +13,25 @@ Fun with Neural Networks
 
 Cette page est dédiée à l'évaluation de réseaux de neuronnes tels présentés 
 par Guillaume Roy-Fortin lors de sa 
-[célèbre série de séminaires](https://groyfortin.github.io/ml.html) présentés
-en 2019.
+[célèbre série de séminaires](https://groyfortin.github.io/ml.html) qui furent
+tenus à l'ÉTS en 2019.
 
 Nous ne considérons ici que des _réseaux de neuronnes complètement connectés_
 (en anglais, _fully connected neural networks_) que nous abrégeons par
 __RNCC__.
 
-Des exemples de tels réseaux déjà entraînés ainsi que des outils logiciels pour en entrainer de nouveaux sont disponibles [ici](https://github.com/xprov/NeuralNetwork).
+Des exemples de réseaux déjà entraînés ainsi que des outils logiciels pour en
+entrainer de nouveaux sont disponibles
+[ici](https://github.com/xprov/NeuralNetwork).
+
+
 
  - Étape 1, importer un RNCC.
 
   <div id="drop-area">
   <form class="my-form">
   <p>Déposer l'export du RNCC ici (drag and drop).</p>
-  <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
+  <input type="file" id="fileElem" onchange="uploadFile(this.files)">
   <label class="button" for="fileElem">Choisir le fichier</label>
   </form>
   </div>
@@ -53,5 +57,11 @@ Des exemples de tels réseaux déjà entraînés ainsi que des outils logiciels 
 
 
 
-<script src="tuto.js"></script>
+
+
+
+<!-- <script src="fileupload.js"></script> -->
+<script src="fcnn.js"></script>
+<script src="fileupload.js"></script>
+
 

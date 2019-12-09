@@ -15,8 +15,8 @@ a {
 	border: 2px dashed #ccc;
 	border-radius: 20px;
 	width: 380px;
-	margin: 50px;
-	padding: 20px;
+	margin: 30px;
+	padding: 10px;
 }
 #drop-area.highlight {
 	border-color: purple;
