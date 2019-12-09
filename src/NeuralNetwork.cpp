@@ -145,11 +145,11 @@ namespace BPN
               for ( int32_t prevIdx = 0; prevIdx <= m_layerSizes[i-1]; ++prevIdx )
                 {
                   activation += m_neurons[i-1][prevIdx].value * m_weightsByLayer[i-1](prevIdx, actualIdx);
-                  //std::cout << "layer=" << i 
-                  //  << ", actualIdx" << actualIdx 
-                  //  << ", prevIdx=" << prevIdx 
-                  //  << ", activation = " << m_neurons[i-1][prevIdx].value 
-                  //  << " * " << m_weightsByLayer[i-1](prevIdx, actualIdx) << std::endl;
+                  std::cout << "layer=" << i 
+                    << ", actualIdx" << actualIdx 
+                    << ", prevIdx=" << prevIdx 
+                    << ", activation = " << m_neurons[i-1][prevIdx].value 
+                    << " * " << m_weightsByLayer[i-1](prevIdx, actualIdx) << std::endl;
                 }
 
               // Apply activation function

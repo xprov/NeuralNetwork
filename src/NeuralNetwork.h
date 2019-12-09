@@ -91,6 +91,16 @@ namespace BPN
           return m_clampedOutputs;
         }
 
+      inline const std::vector<double> getUnClampedOutput() const
+        {
+          std::vector<double> t;
+          for (int i=0; i<m_numOutputs; ++i) 
+            {
+              t.push_back(m_outputNeurons->at(i).value);
+            }
+          return t;
+        }
+
   private:
       void loadFromFile(const char* filename);
       void InitializeNetwork();
