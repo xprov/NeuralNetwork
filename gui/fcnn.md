@@ -28,40 +28,41 @@ entrainer de nouveaux sont disponibles
 
  - Étape 1, importer un RNCC.
 
-  <div id="drop-area">
-  <form class="my-form">
-  <p>Déposer l'export du RNCC ici (drag and drop).</p>
-  <input type="file" id="fileElem" onchange="uploadFile(this.files)">
-  <label class="button" for="fileElem">Choisir le fichier</label>
-  </form>
-  </div>
-  <div id="copy-paste-area">
-  ou faire un copier/coller de l'export ici :<br>
-  <textarea id="importBox" rows="4" cols="100" wrap="off"> </textarea> 
-  <br>
-  <button id="importButton" onclick="importFCNN()">Importer</button> 
-  </div>
-  <div id="fcnn-display-area">
-  </div>
+<html>
+<div id="drop-area">
+<form class="my-form">
+<p>Déposer l'export du RNCC ici (drag and drop).</p>
+<input type="file" id="fileElem" onchange="uploadFile(this.files)">
+<label class="button" for="fileElem">Choisir le fichier</label>
+</form>
+</div>
+<div id="copy-paste-area">
+ou faire un copier/coller de l'export ici :<br>
+<textarea id="importBox" rows="4" cols="100" wrap="off"> </textarea> 
+<br>
+<button id="importButton" onclick="importFCNN()">Importer</button> 
+</div>
+<div id="fcnn-display-area">
+</div>
 
- - Étape 2, saisir les valeurs des neuronnes en entrée : <input type="text" id="inputValues" >
-   <button id="evaluateButton" onclick="evaluateFCNN()">Évaluater</button> 
-   <br>
-   <p style="font-size:12px">
-   Entrer la liste des valeurs à affecter aux neuronnes d'entrée avec ou sans virgules. 
-   Par exemple : 0.1 0.2 0.3 ou 0.1,0.2,0.3
-   </p>
-   <div id="output-display-area"></p>
+- Étape 2, saisir les valeurs des neuronnes en entrée : <input type="text" id="inputValues" >
+<button id="evaluateButton" onclick="evaluateFCNN()">Évaluater</button> 
+<br>
+<p style="font-size:12px">
+Entrer la liste des valeurs à affecter aux neuronnes d'entrée avec ou sans virgules. 
+Par exemple : 0.1 0.2 0.3 ou 0.1,0.2,0.3
+</p>
+<div id="output-display-area"></div>
 
+<p> test </p>
 
+<div class="slidecontainer">
+  <input type="range" min="1" max="150" value="75" class="slider" id="horizontalSpacingSlider">
+  <input type="range" min="1" max="100" value="50" class="slider" id="verticalSpacingSlider">
+  <input type="range" min="1" max="50" value="15" class="slider" id="neuronsSizeSlider">
+</div>
 
-
-
-
-
-
-<!-- <script src="fileupload.js"></script> -->
 <script src="fcnn.js"></script>
 <script src="fileupload.js"></script>
-
+</html>
 

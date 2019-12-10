@@ -85,6 +85,30 @@ class FCNN {
       }
       this.weights.push(outOfLayerK)
     }
+
+    this.neuronsSize = 20;
+    this.horizontalSpacing = 75;
+    this.verticalSpacing = 50;
+    this.computeNeuronsPositions();
+  }
+
+  computeNeuronsPositions() {
+    // Compute neurons positions, for drawing purpose
+    // this.position_x[i][j] is the x coordinate of the j-th neurons of the i-th layer
+    // this.position_y[i][j] is the y coordinate of the j-th neurons of the i-th layer
+    this.position_x = [];
+    this.position_y = [];
+    for (var i=0; i<this.numLayers; i++) {
+      this.position_x.push([]);
+      this.position_y.push([]);
+      var x = Math.round(this.horizontalSpacing/2) + i*this.horizontalSpacing;
+      var y = Math.round(this.verticalSpacing/2);
+      for (var j=0; j<this.layers[i]; j++) {
+	y += this.verticalSpacing;
+	this.position_x[i].push(x);
+	this.position_y[i].push(y);
+      }
+    }
   }
 
   /**
@@ -101,13 +125,15 @@ class FCNN {
     // update all other layers
     for (var k=1; k<this.numLayers; k++) {
       for (var j=0; j<this.layers[k]; j++) {
-        var activation = 0.0;
-        for (var i=0; i<=this.layers[k-1]; i++) {
-          activation += this.neurons[k-1][i] * this.weights[k-1][i][j];
-        }
-        this.neurons[k][j] = this.activationFunction(activation);
+	var activation = 0.0;
+	for (var i=0; i<=this.layers[k-1]; i++) {
+	  activation += this.neurons[k-1][i] * this.weights[k-1][i][j];
+	}
+	this.neurons[k][j] = this.activationFunction(activation);
       }
     }
+
+    this.displaySelf();
 
     return this.getOutput();
   }
@@ -125,6 +151,27 @@ class FCNN {
     + "<li>  Taille de toutes les couches : (entrée) " + this.layers + " (sortie)</li>"
     + "<li>  Fonction d'activation : " + this.activationFunctionsName + "</li>"
     + "</ul>"
+  }
+
+  
+
+
+  displaySelf() {
+    myDisplayArea.clear();
+    var ctx = myDisplayArea.context;
+    for (var i=0; i<this.numLayers; i++) {
+      for (var j=0; j<this.layers[i]; j++) {
+	var x = this.position_x[i][j];
+	var y = this.position_y[i][j];
+	ctx.beginPath();
+	var intensity = Math.floor(255.0 * this.neurons[i][j]);
+	ctx.fillStyle = "rgb("+intensity+"," + intensity + "," + intensity + ")";
+	ctx.fillRect(x, y, this.neuronsSize, this.neuronsSize);
+	ctx.lineWidth = "2";
+	ctx.strokeStyle = "black";
+	ctx.strokeRect(x, y, this.neuronsSize, this.neuronsSize);
+      }
+    }
   }
 }
 
@@ -204,6 +251,54 @@ inputValues.addEventListener("keyup", function(event) {
   }
 }); 
 
+
+var myDisplayArea = {
+	canvas : document.createElement("canvas"),
+	start : function() {
+		this.canvas.width = 700;
+		this.canvas.height = 400;
+		this.context = this.canvas.getContext("2d");
+		document.body.appendChild(this.canvas);
+	},
+
+	clear : function() {
+	  var ctx = this.context;
+	  ctx.fillStyle = "white";
+	  ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+	}
+};
+
+
+
+// var c = document.getElementById("myCanvas");
+// var ctx = c.getContext("2d");
+
+myDisplayArea.start();
+myDisplayArea.clear();
+
+var hslider = document.getElementById("horizontalSpacingSlider");
+hslider.oninput = function() {
+  console.log(this.value);
+  fcnn.horizontalSpacing = this.value;
+  fcnn.computeNeuronsPositions();
+  fcnn.displaySelf();
+}
+
+var vslider = document.getElementById("verticalSpacingSlider");
+vslider.oninput = function() {
+  console.log(this.value);
+  fcnn.verticalSpacing = this.value;
+  fcnn.computeNeuronsPositions();
+  fcnn.displaySelf();
+}
+
+var sslider = document.getElementById("neuronsSizeSlider");
+sslider.oninput = function() {
+  console.log(this.value);
+  fcnn.neuronsSize = this.value;
+  fcnn.computeNeuronsPositions();
+  fcnn.displaySelf();
+}
 
 
 
