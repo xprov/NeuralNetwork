@@ -7,6 +7,73 @@ ActivationFunctions = {
   "Sigmoid(1)" : function(x) {return 1.0 / (1.0 + Math.exp(-1.0 * x));}
 }
 
+class Neuron {
+  constructor(fcnn, layer, index, isBiais) {
+    this.fcnn = fcnn;
+    this.layer = layer;
+    this.index = index;
+    this.isBiais = isBiais;
+    this.value = (isBiais) ? 1.0 : 0.0;
+    this.activation = 0.0;
+    this.center = [0,0];
+    this.topLeft = [0,0];
+    this.bottomRight = [0,0];
+  }
+
+  update(activation, value) {
+    this.activation = activation;
+    this.value = value;
+  }
+
+  updatePosition() {
+    var opt = this.fcnn.displayOptions;
+    var halfSize = Math.round(0.5*opt.neuronsSize);
+    this.center = [
+      Math.round((0.5+this.layer)*opt.horizontalSpacing + halfSize),
+      Math.round((0.5+this.index)*opt.verticalSpacing   + halfSize)
+    ];
+    this.topLeft     = [this.center[0]-halfSize, this.center[1]-halfSize];
+    this.bottomRight = [this.center[0]+halfSize, this.center[1]+halfSize];
+  }
+
+  isClicked(x, y) {
+    return (!this.isBiais) 
+      && this.topLeft[0] <= x && x <= this.bottomRight[0] 
+      && this.topLeft[1] <= y && y <= this.bottomRight[1];
+  }
+
+  toString() {
+    return "Neuron(layer=" + this.layer 
+      + ", index=" + this.index 
+      + ", value=" + this.value 
+      + ", center=" + this.center 
+      + ")";
+  }
+
+  displaySelf(ctx) {
+    var x = this.topLeft[0];
+    var y = this.topLeft[1];
+    var size = this.fcnn.displayOptions.neuronsSize;
+    ctx.beginPath();
+    var intensity = Math.floor(255.0 * this.value);
+    ctx.fillStyle = "rgb("+intensity+"," + intensity + "," + intensity + ")";
+    ctx.fillRect(x, y, size, size);
+    ctx.lineWidth = "2";
+    ctx.strokeStyle = "black";
+    ctx.strokeRect(x, y, size, size);
+  }
+
+
+}
+
+class FCNNDisplayOptions {
+  constructor() {
+    this.neuronsSize = 20;
+    this.horizontalSpacing = 75;
+    this.verticalSpacing = 50;
+  }
+}
+
 class FCNN {
   constructor(text) {
     text = text.trim();
@@ -50,13 +117,25 @@ class FCNN {
     // built neurons
     // in this implementation, a neuron is just a number (float)
     // each layer of neurons is stored in an array
-    this.neurons = []
-    this.layers.forEach(k => {this.neurons.push(new Array(k).fill(0.0));});
-    // to each layer, except the last one, we add an extra neuron with value 1.
-    // This neuron represents the biais ans will never be updated.
-    for (var i=0; i<this.neurons.length-1; i++) {
-      this.neurons[i].push(1.0);
+    this.neurons = [];
+    for (var i=0; i<this.numLayers; i++) {
+      var layer = [];
+      for (var j=0; j<this.layers[i]; j++) {
+	layer.push(new Neuron(this, i, j, false));
+      }
+      if (i != this.numLayers-1) {
+	// to each layer, except the last one, we add an extra neuron with value 1.
+	// This neuron represents the biais ans will never be updated.
+	var biais = new Neuron(this, i, this.layers, true);
+	layer.push(biais);
+      }
+      this.neurons.push(layer);
     }
+
+    //this.layers.forEach(k => {this.neurons.push(new Array(k).fill(0.0));});
+    //for (var i=0; i<this.neurons.length-1; i++) {
+    //  this.neurons[i].push(1.0);
+    //}
 
 
     // parse weights
@@ -86,27 +165,14 @@ class FCNN {
       this.weights.push(outOfLayerK)
     }
 
-    this.neuronsSize = 20;
-    this.horizontalSpacing = 75;
-    this.verticalSpacing = 50;
-    this.computeNeuronsPositions();
+    this.displayOptions = new FCNNDisplayOptions();
+    this.updateNeuronsPositions();
   }
 
-  computeNeuronsPositions() {
-    // Compute neurons positions, for drawing purpose
-    // this.position_x[i][j] is the x coordinate of the j-th neurons of the i-th layer
-    // this.position_y[i][j] is the y coordinate of the j-th neurons of the i-th layer
-    this.position_x = [];
-    this.position_y = [];
+  updateNeuronsPositions() {
     for (var i=0; i<this.numLayers; i++) {
-      this.position_x.push([]);
-      this.position_y.push([]);
-      var x = Math.round(this.horizontalSpacing/2) + i*this.horizontalSpacing;
-      var y = Math.round(this.verticalSpacing/2);
       for (var j=0; j<this.layers[i]; j++) {
-	y += this.verticalSpacing;
-	this.position_x[i].push(x);
-	this.position_y[i].push(y);
+	this.neurons[i][j].updatePosition();
       }
     }
   }
@@ -119,7 +185,7 @@ class FCNN {
 
     // update input neurons
     for (var i=0; i<this.layers[0]; i++) {
-      this.neurons[0][i] = input[i];
+      this.neurons[0][i].update(input[i], input[i]); // no actication function on input nodes
     }
 
     // update all other layers
@@ -127,9 +193,9 @@ class FCNN {
       for (var j=0; j<this.layers[k]; j++) {
 	var activation = 0.0;
 	for (var i=0; i<=this.layers[k-1]; i++) {
-	  activation += this.neurons[k-1][i] * this.weights[k-1][i][j];
+	  activation += this.neurons[k-1][i].value * this.weights[k-1][i][j];
 	}
-	this.neurons[k][j] = this.activationFunction(activation);
+	this.neurons[k][j].update(activation, this.activationFunction(activation));
       }
     }
 
@@ -161,19 +227,14 @@ class FCNN {
     var ctx = myDisplayArea.context;
     for (var i=0; i<this.numLayers; i++) {
       for (var j=0; j<this.layers[i]; j++) {
-	var x = this.position_x[i][j];
-	var y = this.position_y[i][j];
-	ctx.beginPath();
-	var intensity = Math.floor(255.0 * this.neurons[i][j]);
-	ctx.fillStyle = "rgb("+intensity+"," + intensity + "," + intensity + ")";
-	ctx.fillRect(x, y, this.neuronsSize, this.neuronsSize);
-	ctx.lineWidth = "2";
-	ctx.strokeStyle = "black";
-	ctx.strokeRect(x, y, this.neuronsSize, this.neuronsSize);
+	this.neurons[i][j].displaySelf(ctx);
       }
     }
   }
 }
+
+
+
 
 /**
  * Page interaction
@@ -192,7 +253,6 @@ function importFCNN() {
   } catch (err) {
     document.getElementById("fcnn-display-area").innerHTML = "Erreur à l'importation, réseau invalide. (" + err + ")";
   }
-  //console.log(fcnn);
 }
 
 /**
@@ -278,27 +338,60 @@ myDisplayArea.clear();
 
 var hslider = document.getElementById("horizontalSpacingSlider");
 hslider.oninput = function() {
-  console.log(this.value);
-  fcnn.horizontalSpacing = this.value;
-  fcnn.computeNeuronsPositions();
+  fcnn.displayOptions.horizontalSpacing = Number(this.value);
+  fcnn.updateNeuronsPositions();
   fcnn.displaySelf();
 }
 
 var vslider = document.getElementById("verticalSpacingSlider");
 vslider.oninput = function() {
-  console.log(this.value);
-  fcnn.verticalSpacing = this.value;
-  fcnn.computeNeuronsPositions();
+  fcnn.displayOptions.verticalSpacing = Number(this.value);
+  fcnn.updateNeuronsPositions()
   fcnn.displaySelf();
 }
 
 var sslider = document.getElementById("neuronsSizeSlider");
 sslider.oninput = function() {
-  console.log(this.value);
-  fcnn.neuronsSize = this.value;
-  fcnn.computeNeuronsPositions();
+  fcnn.displayOptions.neuronsSize = Number(this.value);
+  fcnn.updateNeuronsPositions();
   fcnn.displaySelf();
 }
 
 
+function getCursorPosition(canvas, event) {
+    const rect = canvas.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
+    console.log("x: " + x + " y: " + y)
+}
 
+//// myDisplayArea.canvas.addEventListener('mousedown', function(e) {
+////     getCursorPosition(myDisplayArea.canvas, e)
+//// })
+//// 
+//// myDisplayArea.canvas.addEventListener('mousemove', function(e) {
+////     getCursorPosition(myDisplayArea.canvas, e)
+//// })
+//// 
+//// var mouseclick = false;
+//// var downListener = function() {
+////     mouseclick = true;
+//// }
+//// element.addEventListener('mousedown', downListener)
+//// var moveListener = () => {
+////     moved = true
+//// }
+//// element.addEventListener('mousemove', moveListener)
+//// var upListener = () => {
+////     if (moved) {
+////         console.log('moved')
+////     } else {
+////         console.log('not moved')
+////     }
+//// }
+//// element.addEventListener('mouseup', upListener)
+//// 
+//// // release memory
+//// element.removeEventListener('mousedown', downListener)
+//// element.removeEventListener('mousemove', moveListener)
+//// element.removeEventListener('mouseup', upListener)
