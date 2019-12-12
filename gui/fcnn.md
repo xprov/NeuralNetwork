@@ -63,12 +63,16 @@ ou faire un copier/coller de l'export ici :<br>
   <col align="left">
   <col align="left">
   <col align="left">
+  <col align="left">
+  <col align="left">
   <tr>
     <td>Espacement horizontal </td>
     <td><input type="range" min="1" max="150" value="75" class="slider" id="horizontalSpacingSlider"></td>
     <td></td>
     <td><input type="checkbox" id="showConnexions" name="showConnexions" value="showConnexions"></td>
     <td>Afficher les liens</td>
+    <td></td>
+    <td><button id="setToZero" onclick="setAllInputsToZero()">Tout mettre à zéro</button> 
   </tr>
   <tr>
     <td>Espacement vertical</td>
@@ -76,6 +80,8 @@ ou faire un copier/coller de l'export ici :<br>
     <td></td>
     <td><input type="checkbox" id="showBiais" name="showBiais" value="showBiais"></td>
     <td>Afficher les biais</td>
+    <td></td>
+    <td><button id="setToOne" onclick="setAllInputsToOne()">Tout mettre à un</button> 
   </tr>
   <tr>
     <td>Taille des neurones</td>

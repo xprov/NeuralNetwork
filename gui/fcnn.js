@@ -1,7 +1,8 @@
-/**
- * Fully Connected Neural Network
- */
 
+////////////////////////////////////////////////////////
+//
+// Fully connexted neural network (begin)
+//
 
 ActivationFunctions = {
   "Sigmoid(1)" : function(x) {return 1.0 / (1.0 + Math.exp(-1.0 * x));}
@@ -78,8 +79,12 @@ class Neuron {
     var size = this.fcnn.displayOptions.neuronsSize;
     if (!this.isBiais) {
       ctx.beginPath();
-      var intensity = Math.floor(255.0 * this.value);
-      ctx.fillStyle = "rgb("+intensity+"," + intensity + "," + intensity + ")";
+      if (Number.isNaN(this.vlue)) {
+	ctx.fillStyle = "red";
+      } else {
+	var intensity = Math.floor(255.0 * this.value);
+	ctx.fillStyle = "rgb("+intensity+"," + intensity + "," + intensity + ")";
+      }
       ctx.fillRect(x, y, size, size);
       ctx.lineWidth = "2";
       ctx.strokeStyle = "black";
@@ -206,18 +211,13 @@ class FCNN {
 
   updateNeuronsPositions() {
     this.neurons.forEach( layer => {layer.forEach( n => {n.updatePosition();})});
-    //for (var i=0; i<this.numLayers; i++) {
-    //  for (var j=0; j<this.layers[i]; j++) {
-    //    this.neurons[i][j].updatePosition();
-    //  }
-    //}
   }
 
   /**
    * Assing the given values to the input neurons and updates all layers
    * consequently.
    */
-  evaluate(input) {
+  evaluateWithNewInput(input) {
 
     // update input neurons
     for (var i=0; i<this.layers[0]; i++) {
@@ -227,6 +227,14 @@ class FCNN {
 	this.neurons[0][i].update(0.0, 0.0); // unspecified input, set to 0
     }
 
+    this.computeNonInputLayers();
+  }
+
+  evaluateWithActualInput() {
+    this.computeNonInputLayers();
+  }
+
+  computeNonInputLayers() {
     // update all other layers
     for (var k=1; k<this.numLayers; k++) {
       for (var j=0; j<this.layers[k]; j++) {
@@ -237,12 +245,11 @@ class FCNN {
 	this.neurons[k][j].update(activation, this.activationFunction(activation));
       }
     }
-
     return this.getOutput();
   }
 
   getOutput() {
-    return this.neurons[this.numLayers-1];
+    return this.neurons[this.numLayers-1].map(n => {return n.value});
   }
 
 
@@ -255,9 +262,6 @@ class FCNN {
     + "<li>  Fonction d'activation : " + this.activationFunctionsName + "</li>"
     + "</ul>"
   }
-
-  
-
 
   displaySelf() {
     myDisplayArea.clear();
@@ -285,14 +289,34 @@ class FCNN {
       if (this.displayOptions.showBiais || !n.isBiais) n.displaySelf(ctx)
     })});
   }
+
+  getNeuronUnderClick(x, y) {
+    for (var i=0; i<this.layers[0]; i++) {
+      var neuron = this.neurons[0][i];
+      if (neuron.isClicked(x, y)) {
+	return neuron;
+      }
+    }
+  }
+
 }
 
+//
+// Fully connexted neural network (end)
+//
+////////////////////////////////////////////////////////
 
 
 
-/**
- * Page interaction
- */
+
+
+
+
+
+////////////////////////////////////////////////////////
+//
+// Page interaction (begin)
+//
 
 var fcnn = null;
 
@@ -301,6 +325,7 @@ var fcnn = null;
  */
 function importFCNN() {
   var inputText = document.getElementById("importBox").value;
+  inputText = ''+inputText.trim().replace(/ +(?= )/g,''); // replace multiple spaces by a single one
   try {
     fcnn = new FCNN(inputText);
     fcnn.displaySelf();
@@ -321,6 +346,7 @@ function evaluateFCNNwithTextInput() {
   }
   var inputText = document.getElementById("importBox").value;
   var inputValues = document.getElementById("inputValues").value;
+  inputValues = ''+inputValues.trim().replace(/ +(?= )/g,''); // remove multple spaces by a single one
   var input = null;
   if (inputValues.indexOf(",") != -1) {
     input = inputValues.split(",").map(function(x) {return parseFloat(x)});
@@ -328,22 +354,22 @@ function evaluateFCNNwithTextInput() {
     input = inputValues.split(" ").map(function(x) {return parseFloat(x)});
   }
 
-  fcnn.evaluate(input);
+  fcnn.evaluateWithNewInput(input);
 
   outputValues = fcnn.getOutput();
   outputHTML = outputValues.map(function(valeur, index) {
-    return "Neuron " + (index+1) + " : " + valeur;
+    return "&emsp;Neuron " + (index+1) + " : " + valeur;
   }).join("<br>");
-  document.getElementById("output-display-area").innerHTML = outputHTML;
+  document.getElementById("output-display-area").innerHTML = "Valeurs des neurones en sortie :<br>" +  outputHTML;
 
   fcnn.displaySelf();
 }
 
 // Pressing the ENTER key in the import box will trigger the 'importer'
 // button.
-var inputValues = document.getElementById("importBox");
+var importBox = document.getElementById("importBox");
 // Execute a function when the user releases a key on the keyboard
-inputValues.addEventListener("keyup", function(event) {
+importBox.addEventListener("keyup", function(event) {
   // Number 13 is the "Enter" key on the keyboard
   if (event.keyCode === 13) {
     // Cancel the default action, if needed
@@ -371,6 +397,38 @@ inputValues.addEventListener("keyup", function(event) {
 }); 
 
 
+function setAllInputsToZero() {
+  document.getElementById("inputValues").value = fcnn.neurons[0].map(n => {return "0.0"}).join(" ");
+  document.getElementById("evaluateButton").click();
+}
+
+function setAllInputsToOne() {
+  document.getElementById("inputValues").value = fcnn.neurons[0].map(n => {return "1.0"}).join(" ");
+  document.getElementById("evaluateButton").click();
+}
+
+//
+// Page interaction (begin)
+//
+////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////
+//
+// Graphic display (begin)
+//
+
+
+
+
 var myDisplayArea = {
 	canvas : document.createElement("canvas"),
 	start : function() {
@@ -386,11 +444,6 @@ var myDisplayArea = {
 	  ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 	}
 };
-
-
-
-// var c = document.getElementById("myCanvas");
-// var ctx = c.getContext("2d");
 
 myDisplayArea.start();
 myDisplayArea.clear();
@@ -457,42 +510,110 @@ showBiais.oninput = function() {
 }
 
 
-function getCursorPosition(canvas, event) {
-    const rect = canvas.getBoundingClientRect()
+
+//
+// Graphic display (end)
+//
+////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////
+//
+// Mouse control (begin)
+//
+
+
+// Drag detection 
+// Of course it was taken from StackOverflow 
+// https://stackoverflow.com/questions/37239710/detecting-clicks-versus-drags-on-an-html-5-canvas
+var isDown   = false;   // mouse button is held down
+var isMoving = false;   // we're moving (dragging)
+var radius   = 9 * 9    // radius in pixels, 9 squared
+var firstPos = null;    // keep track of first position
+var actualNeuron = null;
+var forcedValue = null;;
+
+
+function getXY(event) {
+    const rect = myDisplayArea.canvas.getBoundingClientRect()
     const x = event.clientX - rect.left
     const y = event.clientY - rect.top
-    console.log("x: " + x + " y: " + y)
+    return {x : x, y : y};
 }
 
 
+function simpleClick(x, y) {
+  neuron = fcnn.getNeuronUnderClick(x, y);
+  if (neuron != null) {
+    // update drag-related variables
+    actualNeuron = neuron;
+    firstPos = {x:x, y:y};
+    forcedValue = (neuron.value == 1.0) ? 0.0 : 1.0;
+
+    // update fcnn and display
+    neuron.update(forcedValue, forcedValue);
+    fcnn.evaluateWithActualInput();
+    fcnn.displaySelf();
+  }
+}
+
 
 myDisplayArea.canvas.addEventListener('mousedown', function(e) {
-    getCursorPosition(myDisplayArea.canvas, e)
-})
+  var pos = getXY(e);
+  isDown = true;           // record mouse state
+  isMoving = false;        // reset move state
+  simpleClick(pos.x, pos.y);
+});
 
-myDisplayArea.canvas.addEventListener('mousemove', function(e) {
-    getCursorPosition(myDisplayArea.canvas, e)
-})
-//// 
-//// var mouseclick = false;
-//// var downListener = function() {
-////     mouseclick = true;
-//// }
-//// element.addEventListener('mousedown', downListener)
-//// var moveListener = () => {
-////     moved = true
-//// }
-//// element.addEventListener('mousemove', moveListener)
-//// var upListener = () => {
-////     if (moved) {
-////         console.log('moved')
-////     } else {
-////         console.log('not moved')
-////     }
-//// }
-//// element.addEventListener('mouseup', upListener)
-//// 
-//// // release memory
-//// element.removeEventListener('mousedown', downListener)
-//// element.removeEventListener('mousemove', moveListener)
-//// element.removeEventListener('mouseup', upListener)
+myDisplayArea.canvas.addEventListener("mousemove", function(e) {
+  if (!isDown) return;     // we will only act if mouse button is down
+  var pos = getXY(e);      // get current mouse position
+
+  // calculate distance from click point to current point
+  var dx = firstPos.x - pos.x,
+  dy = firstPos.y - pos.y,
+  dist = dx * dx + dy * dy;  // skip square-root (see above)
+
+  if (dist >= radius) isMoving = true; // 10-4 we're on the move
+
+  if (isMoving) {
+    var neuron = fcnn.getNeuronUnderClick(pos.x, pos.y);
+    if (neuron != null && neuron != actualNeuron) {
+      actualNeuron = neuron;
+      neuron.update(forcedValue, forcedValue);
+      fcnn.evaluateWithActualInput();
+      fcnn.displaySelf();
+    }
+  }
+});
+
+window.addEventListener("mouseup", function(e) {
+  if (!isDown) return;     // no need for us in this case
+  isDown = false;          // record mouse state
+});
+
+
+
+
+//
+// Mouse control (end)
+//
+////////////////////////////////////////////////////////
+
+
+// Set default values, only for demo purpose
+document.getElementById("importBox").value = "layerSizes [3,2,3]\nactivation Sigmoid(1)\nweights 0.323920816486 -0.339730317678 0.468184009305 -0.705916355079 0.979209477421 -0.961654662731 0.244747608223 -0.0210112436284 0.282103125049 -0.863724506547 0.324960247575 -0.420031516944 0.549959459178 -0.352039678653 0.21571654497 -0.176369066892 0.409302949536";
+
+
+document.getElementById("inputValues").value = "1 0 1";
+document.getElementById("importButton").click();
+document.getElementById("evaluateButton").click();
+
+
+
