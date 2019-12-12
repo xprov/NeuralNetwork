@@ -55,6 +55,12 @@ ou faire un copier/coller de l'export ici :<br>
 
 <div id="output-display-area"></div>
 
+<h2> Visualisation</h2>
+
+Cliquez sur une cellule en entrée (à gauche) pour modifier sa valeur (noir : 0, blanc : 1). 
+<br>
+<br>
+<br>
 
 <div class="slidecontainer">
 <table>
