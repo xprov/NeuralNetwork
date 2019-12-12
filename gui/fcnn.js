@@ -28,35 +28,37 @@ class Neuron {
 
   // todo fcnn should compute all there and simply affect the values to each neuron
   updatePosition() {
+    console.log("in");
     var opt = this.fcnn.displayOptions;
     var size = opt.neuronsSize;
     var halfSize = Math.round(0.5*size);
 
     if (opt.inputDisposition === "column") {
       this.center = [
-	Math.round((1.0+this.layer)*opt.horizontalSpacing),
+	Math.round((0.5+this.layer)*opt.horizontalSpacing),
 	Math.round((1.0+this.index)*opt.verticalSpacing)
       ];
     }
 
     else if (opt.inputDisposition === "square") {
-      var inputSquareSize = Math.ceil(Math.sqrt(fcnn.layers[0]));
+      var inputSquareSize = Math.ceil(Math.sqrt(this.fcnn.layers[0]));
       if (this.layer == 0) { // input node
 	var row = Math.floor(this.index / inputSquareSize);
 	var col = this.index % inputSquareSize;
 	this.center = [
-	  Math.round(opt.horizontalSpacing + col*size),
+	  Math.round(0.5*opt.horizontalSpacing + col*size),
 	  Math.round(opt.verticalSpacing + row*size)
 	];
       } else {
 	this.center = [
-	  Math.round((1.0+this.layer)*opt.horizontalSpacing + (inputSquareSize-1)*size),
+	  Math.round((0.5+this.layer)*opt.horizontalSpacing + (inputSquareSize-1)*size),
 	  Math.round((1.0+this.index)*opt.verticalSpacing  )
 	];
       }
     }
     this.topLeft     = [this.center[0]-halfSize, this.center[1]-halfSize];
     this.bottomRight = [this.center[0]+halfSize, this.center[1]+halfSize];
+    console.log("out");
   }
 
   isClicked(x, y) {
@@ -105,12 +107,21 @@ class Neuron {
 
 class FCNNDisplayOptions {
   constructor() {
-    this.neuronsSize = 20;
-    this.horizontalSpacing = 75;
-    this.verticalSpacing = 50;
-    this.inputDisposition = "column"; // "column" or "square"
-    this.showConnexions = false;
-    this.showBiais = false;
+    this.neuronsSize       = Number(document.getElementById("neuronsSizeSlider").value);
+    this.horizontalSpacing = Number(document.getElementById("horizontalSpacingSlider").value);
+    this.verticalSpacing   = Number(document.getElementById("verticalSpacingSlider").value);
+    this.showConnexions    = document.getElementById("showConnexions").checked;
+    this.showBiais         = document.getElementById("showBiais").checked;
+    var radioColumn        = document.getElementById("radioDispositionColumn");
+    if (radioColumn.checked) {
+      this.inputDisposition = "column";
+    }
+    var radioSquare = document.getElementById("radioDispositionSquare");
+    if (radioSquare.checked) {
+      this.inputDisposition = "square";
+    }
+    console.log("displayOptions constructor");
+    console.log(this);
   }
 }
 
@@ -171,12 +182,6 @@ class FCNN {
       }
       this.neurons.push(layer);
     }
-
-    //this.layers.forEach(k => {this.neurons.push(new Array(k).fill(0.0));});
-    //for (var i=0; i<this.neurons.length-1; i++) {
-    //  this.neurons[i].push(1.0);
-    //}
-
 
     // parse weights
     // this.weights[k][i][j] is the weight of the link from the i-th neuron of
@@ -264,6 +269,8 @@ class FCNN {
   }
 
   displaySelf() {
+    console.log("DisplaySelf");
+    console.log(this.displayOptions);
     myDisplayArea.clear();
     var ctx = myDisplayArea.context;
     
@@ -324,6 +331,9 @@ var fcnn = null;
  * Load the neural network as described in the importBox text area.
  */
 function importFCNN() {
+  console.log("importFCNN");
+  console.log("avant");
+  console.log(fcnn);
   var inputText = document.getElementById("importBox").value;
   inputText = ''+inputText.trim().replace(/ +(?= )/g,''); // replace multiple spaces by a single one
   try {
@@ -333,6 +343,8 @@ function importFCNN() {
   } catch (err) {
     document.getElementById("fcnn-display-area").innerHTML = "Erreur à l'importation, réseau invalide. (" + err + ")";
   }
+  console.log("apres");
+  console.log(fcnn);
 }
 
 /**
@@ -475,8 +487,8 @@ sslider.oninput = function() {
   }
 }
 
-var radioDispositionColonne = document.getElementById("radioDispositionColumn");
-radioDispositionColonne.oninput = function() {
+var radioDispositionColumn = document.getElementById("radioDispositionColumn");
+radioDispositionColumn.oninput = function() {
   if (fcnn != null) {
     fcnn.displayOptions.inputDisposition = this.value;
     fcnn.updateNeuronsPositions();
@@ -573,6 +585,8 @@ myDisplayArea.canvas.addEventListener('mousedown', function(e) {
 
 myDisplayArea.canvas.addEventListener("mousemove", function(e) {
   if (!isDown) return;     // we will only act if mouse button is down
+  if (firstPos == null) return;
+
   var pos = getXY(e);      // get current mouse position
 
   // calculate distance from click point to current point
@@ -608,7 +622,7 @@ window.addEventListener("mouseup", function(e) {
 
 
 // Set default values, only for demo purpose
-document.getElementById("importBox").value = "layerSizes [3,2,3]\nactivation Sigmoid(1)\nweights 0.323920816486 -0.339730317678 0.468184009305 -0.705916355079 0.979209477421 -0.961654662731 0.244747608223 -0.0210112436284 0.282103125049 -0.863724506547 0.324960247575 -0.420031516944 0.549959459178 -0.352039678653 0.21571654497 -0.176369066892 0.409302949536";
+document.getElementById("importBox").value = "layerSizes [4, 3, 3, 4]\nactivation Sigmoid(1)\nweights -0.0001562344681289288997 0.2521783446134079343 3.714719972364496137 -3.931593881352937636 0.280205257049870593 -0.6247521316933608571 2.773209420904996225 -3.609155240439869683 -2.840190268089721304 0.9571738423199755985 3.532478318063246192 0.1288337773108554629 0.1385924963734933013 -0.2238409460309026267 -0.1618425653565341293 -7.892251340027419459 -1.795237257781153062 2.197342762701328223 3.535927663874259608 -7.49761164584745643 1.89811578471430531 -0.7906467551368473456 -0.5568245969881417956 -7.621429624900527777 2.366354309619446816 4.899464819949524319 1.575584802223482628 -0.8656706117762484887 13.63400003838826535 -4.571550556423995104 0.4504669517786769051 -1.645914183685520893 2.081442892730561045 4.808623300007098145 -13.87202509730999545 -11.51217201835148352 -0.4631469925675480992 2.337277417274462366 6.108061992549904673 6.379534719861308822 -6.71484273576971713 -1.408995163458243383 3.57318322280086198";
 
 
 document.getElementById("inputValues").value = "1 0 1";

@@ -67,7 +67,7 @@ ou faire un copier/coller de l'export ici :<br>
   <col align="left">
   <tr>
     <td>Espacement horizontal </td>
-    <td><input type="range" min="1" max="150" value="75" class="slider" id="horizontalSpacingSlider"></td>
+    <td><input type="range" min="1" max="500" value="75" class="slider" id="horizontalSpacingSlider"></td>
     <td></td>
     <td><input type="checkbox" id="showConnexions" name="showConnexions" value="showConnexions"></td>
     <td>Afficher les liens</td>
