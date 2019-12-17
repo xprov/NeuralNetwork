@@ -60,6 +60,8 @@ namespace BPN
 
         inline double getOutputErrorGradient( double desiredValue, const Neuron& outputNeuron ) const 
           { 
+            // TODO : mean square error is hard coded here so we have 
+            // a factor : desiredValue - outputNeuron.value;
             double derivative = m_pNetwork->m_sigma->evalDerivative( 
                                               outputNeuron.activation, outputNeuron.value );
             return derivative * ( desiredValue - outputNeuron.value );

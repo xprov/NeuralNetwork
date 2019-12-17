@@ -96,7 +96,7 @@ int main( int argc, char* argv[] )
       std::vector<double> inputData;
       dataReader.readOneInputData( inputData );
       nn->Evaluate( inputData );
-      std::cout << nn->getOutput() << std::endl;
+      std::cout << nn->getUnClampedOutput() << std::endl;
     }
 
 
