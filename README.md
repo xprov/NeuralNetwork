@@ -91,7 +91,7 @@ This project contains three programs :
 
 # Compile and Run Under Windows
 
-Install a super heavy IDE and have fun clicking countless buttons.
+Install a super heavy IDE and make your life miserable clicking countless buttons.
 
 
 
