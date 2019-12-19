@@ -26,37 +26,77 @@ This project contains three programs :
 
 # Compile and Run with Gnu/Linux
 
-Using Synaptic Manager, the simplest way to compile is to use `cmake`
+## Using `cmake` (recommended)
 
-```
-sudo apt-get update
-sudo apt-get install g++ make cmake
-```
+ - Using Synaptic Manager, install the required compilation tools
 
-## Compilation
-```
-mkdir build
-cd build
-cmake ..
-make
-```
+	```
+	sudo apt-get update
+	sudo apt-get install g++ make cmake
+	```
 
-### Debug VS Release Mode
+ -  __Compilation__
 
-Since the training of a neural network requires a lot of computational power, one might find useful to compile a debug and a release versions (the release version should run significantly faster):
-```
-mkdir debug && cd debug && cmake -DCMAKE_BUILD_TYPE=Debug .. && make -j
-cd ..
-mkdir release && cd release && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j
-```
+	```
+	mkdir build
+	cd build
+	cmake ..
+	make
+	```
+
+ - __Debug VS Release Mode__
+
+	Since the training of a neural network requires a lot of computational power, one might find useful to compile a debug and a release versions (the release version should run significantly faster):
+	```
+	mkdir debug && cd debug && cmake -DCMAKE_BUILD_TYPE=Debug .. && make -j
+	cd ..
+	mkdir release && cd release && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j
+	```
+
+ - __Run__
+
+	From the `build` folder
+	```
+	./trainNN -h
+	./evalNN -h
+	```
+
+
+
+## Using `make`
+ 
+ - Using Synaptic Manager, install the required compilation tools
+
+	```
+	sudo apt-get update
+	sudo apt-get install g++ make
+	```
+
+ - __Compilation__
+
+	```
+	make
+	```
+	This creates a `build` directory where executable files are found.
+
+ - __Run__
+
+	From the `build` folder
+	```
+	./trainNN -h
+	./evalNN -h
+	```
+
+
 
 # Compile and Run Under Windows
 
-TODO
+Install a super heavy IDE and have fun clicking countless buttons.
 
 
 
-# Typical Usage
+
+# Train a BPN
 Let's train a Network using data from the
 ``Example/threeShapes/data/threeShapes.csv`` file. In this example, the input
 are binary pictures of size 40x40. Consequently, there needs to be 1600 input
@@ -93,7 +133,7 @@ Epoch :5 Training Set Accuracy:44.265%, MSE: 0.100699 Generalization Set Accurac
 
 Note that in the above example, the trained network is exported to the file ``myTrainedNN``.
 
-# Visualization of BPN
+# Visualization of a BPN
 
 TODO
 
