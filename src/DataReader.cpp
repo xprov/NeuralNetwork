@@ -144,7 +144,7 @@ namespace BPN
                   ss >> d;
                   entry.m_inputs.push_back( d );
                 }
-              for ( int i=0; i < m_numInputs; ++i )
+              for ( int i=0; i < m_numOutputs; ++i )
                 {
                   int32_t x;
                   ss >> x;
