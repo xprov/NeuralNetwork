@@ -15,7 +15,7 @@ This code is meant to be a simple implementation of the back-propagation neural 
 [https://takinginitiative.wordpress.com/2008/04/23/basic-neural-network-tutorial-c-implementation-and-source-code/](https://takinginitiative.wordpress.com/2008/04/23/basic-neural-network-tutorial-c-implementation-and-source-code/)
 
 
-# Project overview
+## Project overview
 
 This project contains three programs :
 
@@ -23,10 +23,16 @@ This project contains three programs :
  - `evalNN` evaluates a BPN on given entries (native C++).
  - a graphic interface for the visualization of a BPN (HTML5 + JS).
 
+## Precompiled binaries
 
-# Compile and Run with Gnu/Linux
+Precompiled executable files for Linux and Windows (both x64) are found in the
+`precompiled` folder.
 
-## Using `cmake` (recommended)
+## Compilation
+
+### Compile under Gnu/Linux
+
+#### Using `cmake` (recommended)
 
  - Using Synaptic Manager, install the required compilation tools
 
@@ -63,7 +69,7 @@ This project contains three programs :
 
 
 
-## Using `make`
+#### Using `make`
  
  - Using Synaptic Manager, install the required compilation tools
 
@@ -87,16 +93,49 @@ This project contains three programs :
 	./evalNN -h
 	```
 
+### Compile under Mac
+
+Pretty much the same thing as under Gnu/Linux, just install `cmake` and `g++`
+using `brew` instead of `apt-get`.
 
 
-# Compile and Run Under Windows
+### Compile under Windows
 
-Install a super heavy IDE and make your life miserable clicking countless buttons.
+Disclaimer: I never use Windows so there might be a simplest way but this is the best I
+could found.
+
+ - Install `Microsoft Visual Studio`
+ - Install the _Workload_ named __Desktop development with C++__ is installed.
+   In Visual Studio, open the __Tools__ menu and then __Get tools and
+   features...__.
+ - Using __File explorer__ go to the `NeuralNetwork` folder. 
+ - Double click on the file `trainBPN.vcxproj`. If a prompt ask for which
+   software to use, select `Visual Studio` or `Visual Studio Version Selector`.
+ - In `Visual Studio`, locate the __Solution explorer__ in which you should see
+   the `trainBPN` project. Right click on `trainBPN` and select __Build__.
+ - DO the same with the `evalNN.vcxproj`.
+
+
+
+## Execution
+
+__For Windows users__: this project tries to follow the [Unix
+philosophy](https://en.wikipedia.org/wiki/Unix_philosophy), therefor it uses
+command lines arguments. Although, these can be specified within `Visual
+Studio` I suggest you to use a shell. 
+
+ - In `File explorer`, go to the `NeuralNetwork` folder and then in the folder
+   where is located the executable file you want to use.
+ - Hold the __shift__ key and right click in the folder.
+ - Select __Open command window here__ or __Open PowerShell here__.
+
+Using the Windows CLI, everything works pretty much as shown here, the main
+difference is to use '\\' instead of'/' between folder names.
 
 
 
 
-# Train a BPN
+### Train a BPN
 Let's train a Network using data from the
 ``Example/threeShapes/data/threeShapes.csv`` file. In this example, the input
 are binary pictures of size 40x40. Consequently, there needs to be 1600 input
@@ -135,7 +174,25 @@ Note that in the above example, the trained network is exported to the file ``my
 
 # Visualization of a BPN
 
-TODO
+Open the file `gui/fcnn.html` in you favorite browser. Instruction are displayed within the page.
+For example, the following images show an import of the pre-trainted network
+`Example/slope/trainedNN/900_20_20_20_4`. Input neurons are displayed as a grid
+since the inputs are images, each pixel provides the value of one input neuron.
+The output neurons have the following interpretation:
+
+ - First neuron : a straight line with a strongly negative slope (less than -1).
+![./images/slope_strongly_negative.png](./images/slope_strongly_negative.png)
+ - Second neuron : a straight line with a weakly negative slope (between -1 and 0).
+![./images/slope_weakly_negative.png](./images/slope_weakly_negative.png)
+ - Third neuron : a straight line with a weakly positive slope (between 0 and 1).
+![./images/slope_weakly_positive.png](./images/slope_weakly_positive.png)
+ - Fourth neuron : a straight line with a strongly positive slope (more than 1).
+![./images/slope_strongly_positive.png](./images/slope_strongly_positive.png)
+
+
+
+
+
 
 
 
