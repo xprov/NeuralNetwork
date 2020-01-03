@@ -105,8 +105,9 @@ Disclaimer: I never use Windows so there might be a simplest way but this is the
 could found.
 
  - Install `Microsoft Visual Studio`
- - Install the _Workload_ named __Desktop development with C++__ is installed.
-   In Visual Studio, open the __Tools__ menu and then __Get tools and
+ - Make sure that  _Workload_ named __Desktop development with C++__ is
+   installed either by selecteing it during the installation process or, in
+   Visual Studio, open the __Tools__ menu and then __Get tools and
    features...__.
  - Using __File explorer__ go to the `NeuralNetwork` folder. 
  - Double click on the file `trainBPN.vcxproj`. If a prompt ask for which
