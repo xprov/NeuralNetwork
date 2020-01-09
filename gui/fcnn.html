@@ -101,6 +101,16 @@ Cliquez sur une cellule en entrée (à gauche) pour modifier sa valeur (noir : 0
     <input type="radio" id="radioDispositionSquare" name="radioDispo" value="square"> Carré
   </td>
 </tr>
+<tr> 
+  <td>Valeur à assigner aux neurones</td>
+  <td> 
+    <input type="range" min="0" max="255" value="255" class="slider" id="inputValueSlider">
+    <canvas id="inputValueAsColor" width=20 height=20></canvas>
+  </td>
+  <td>
+  <div id="inputValueAsText"></div>
+  </td>
+</tr>
 </table>
 </div>
 

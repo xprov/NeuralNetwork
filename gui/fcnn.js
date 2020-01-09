@@ -28,37 +28,35 @@ class Neuron {
 
   // todo fcnn should compute all there and simply affect the values to each neuron
   updatePosition() {
-    console.log("in");
     var opt = this.fcnn.displayOptions;
     var size = opt.neuronsSize;
     var halfSize = Math.round(0.5*size);
 
     if (opt.inputDisposition === "column") {
       this.center = [
-	Math.round((0.5+this.layer)*opt.horizontalSpacing),
-	Math.round((1.0+this.index)*opt.verticalSpacing)
+        Math.round((0.5+this.layer)*opt.horizontalSpacing),
+        Math.round((1.0+this.index)*opt.verticalSpacing)
       ];
     }
 
     else if (opt.inputDisposition === "square") {
       var inputSquareSize = Math.ceil(Math.sqrt(this.fcnn.layers[0]));
       if (this.layer == 0) { // input node
-	var row = Math.floor(this.index / inputSquareSize);
-	var col = this.index % inputSquareSize;
-	this.center = [
-	  Math.round(0.5*opt.horizontalSpacing + col*size),
-	  Math.round(opt.verticalSpacing + row*size)
-	];
+        var row = Math.floor(this.index / inputSquareSize);
+        var col = this.index % inputSquareSize;
+        this.center = [
+          Math.round(0.5*opt.horizontalSpacing + col*size),
+          Math.round(opt.verticalSpacing + row*size)
+        ];
       } else {
-	this.center = [
-	  Math.round((0.5+this.layer)*opt.horizontalSpacing + (inputSquareSize-1)*size),
-	  Math.round((1.0+this.index)*opt.verticalSpacing  )
-	];
+        this.center = [
+          Math.round((0.5+this.layer)*opt.horizontalSpacing + (inputSquareSize-1)*size),
+          Math.round((1.0+this.index)*opt.verticalSpacing  )
+        ];
       }
     }
     this.topLeft     = [this.center[0]-halfSize, this.center[1]-halfSize];
     this.bottomRight = [this.center[0]+halfSize, this.center[1]+halfSize];
-    console.log("out");
   }
 
   isClicked(x, y) {
@@ -81,11 +79,11 @@ class Neuron {
     var size = this.fcnn.displayOptions.neuronsSize;
     if (!this.isBiais) {
       ctx.beginPath();
-      if (Number.isNaN(this.vlue)) {
-	ctx.fillStyle = "red";
+      if (Number.isNaN(this.value)) {
+        ctx.fillStyle = "red";
       } else {
-	var intensity = Math.floor(255.0 * this.value);
-	ctx.fillStyle = "rgb("+intensity+"," + intensity + "," + intensity + ")";
+        var intensity = Math.floor(255.0 * this.value);
+        ctx.fillStyle = "rgb("+intensity+"," + intensity + "," + intensity + ")";
       }
       ctx.fillRect(x, y, size, size);
       ctx.lineWidth = "2";
@@ -120,8 +118,6 @@ class FCNNDisplayOptions {
     if (radioSquare.checked) {
       this.inputDisposition = "square";
     }
-    console.log("displayOptions constructor");
-    console.log(this);
   }
 }
 
@@ -172,13 +168,13 @@ class FCNN {
     for (var i=0; i<this.numLayers; i++) {
       var layer = [];
       for (var j=0; j<this.layers[i]; j++) {
-	layer.push(new Neuron(this, i, j, false));
+        layer.push(new Neuron(this, i, j, false));
       }
       if (i != this.numLayers-1) {
-	// to each layer, except the last one, we add an extra neuron with value 1.
-	// This neuron represents the biais ans will never be updated.
-	var biais = new Neuron(this, i, this.layers[i], true);
-	layer.push(biais);
+        // to each layer, except the last one, we add an extra neuron with value 1.
+        // This neuron represents the biais ans will never be updated.
+        var biais = new Neuron(this, i, this.layers[i], true);
+        layer.push(biais);
       }
       this.neurons.push(layer);
     }
@@ -227,9 +223,9 @@ class FCNN {
     // update input neurons
     for (var i=0; i<this.layers[0]; i++) {
       if  (i < input.length)
-	this.neurons[0][i].update(input[i], input[i]); // no actication function on input nodes
+        this.neurons[0][i].update(input[i], input[i]); // no actication function on input nodes
       else
-	this.neurons[0][i].update(0.0, 0.0); // unspecified input, set to 0
+        this.neurons[0][i].update(0.0, 0.0); // unspecified input, set to 0
     }
 
     this.computeNonInputLayers();
@@ -243,11 +239,11 @@ class FCNN {
     // update all other layers
     for (var k=1; k<this.numLayers; k++) {
       for (var j=0; j<this.layers[k]; j++) {
-	var activation = 0.0;
-	for (var i=0; i<=this.layers[k-1]; i++) {
-	  activation += this.neurons[k-1][i].value * this.weights[k-1][i][j];
-	}
-	this.neurons[k][j].update(activation, this.activationFunction(activation));
+        var activation = 0.0;
+        for (var i=0; i<=this.layers[k-1]; i++) {
+          activation += this.neurons[k-1][i].value * this.weights[k-1][i][j];
+        }
+        this.neurons[k][j].update(activation, this.activationFunction(activation));
       }
     }
     return this.getOutput();
@@ -260,34 +256,32 @@ class FCNN {
 
   toHTML() {
     return "<ul>"
-    + "<li>  Nombre de couches : " + this.numLayers + "</li>"
-    + "<li>  Taille de la couche d'entrée : " + this.layers[0] + "</li>"
-    + "<li>  Taille de la couche de sortie : " + this.layers[this.numLayers-1] + "</li>"
-    + "<li>  Taille de toutes les couches : (entrée) " + this.layers + " (sortie)</li>"
-    + "<li>  Fonction d'activation : " + this.activationFunctionsName + "</li>"
-    + "</ul>"
+      + "<li>  Nombre de couches : " + this.numLayers + "</li>"
+      + "<li>  Taille de la couche d'entrée : " + this.layers[0] + "</li>"
+      + "<li>  Taille de la couche de sortie : " + this.layers[this.numLayers-1] + "</li>"
+      + "<li>  Taille de toutes les couches : (entrée) " + this.layers + " (sortie)</li>"
+      + "<li>  Fonction d'activation : " + this.activationFunctionsName + "</li>"
+      + "</ul>"
   }
 
   displaySelf() {
-    console.log("DisplaySelf");
-    console.log(this.displayOptions);
     myDisplayArea.clear();
     var ctx = myDisplayArea.context;
-    
+
     // connexions between neurons
     if (this.displayOptions.showConnexions) {
       for (var k=1; k<this.numLayers; k++) {
-	for (var j=0; j<this.layers[k]; j++) {
-	  var to = this.neurons[k][j].center;
-	  var numInPreviousLayer = (this.displayOptions.showBiais) ? this.layers[k-1]+1 : this.layers[k-1];
-	  for (var i=0; i<numInPreviousLayer; i++) {
-	    var from = this.neurons[k-1][i].center;
-	    ctx.beginPath();
-	    ctx.moveTo(from[0], from[1]);
-	    ctx.lineTo(to[0], to[1]);
-	    ctx.stroke(); 
-	  }
-	}
+        for (var j=0; j<this.layers[k]; j++) {
+          var to = this.neurons[k][j].center;
+          var numInPreviousLayer = (this.displayOptions.showBiais) ? this.layers[k-1]+1 : this.layers[k-1];
+          for (var i=0; i<numInPreviousLayer; i++) {
+            var from = this.neurons[k-1][i].center;
+            ctx.beginPath();
+            ctx.moveTo(from[0], from[1]);
+            ctx.lineTo(to[0], to[1]);
+            ctx.stroke(); 
+          }
+        }
       }
     }
 
@@ -301,7 +295,7 @@ class FCNN {
     for (var i=0; i<this.layers[0]; i++) {
       var neuron = this.neurons[0][i];
       if (neuron.isClicked(x, y)) {
-	return neuron;
+        return neuron;
       }
     }
   }
@@ -321,19 +315,16 @@ class FCNN {
 
 
 ////////////////////////////////////////////////////////
-//
-// Page interaction (begin)
-//
+  //
+  // Page interaction (begin)
+  //
 
-var fcnn = null;
+  var fcnn = null;
 
 /**
  * Load the neural network as described in the importBox text area.
  */
 function importFCNN() {
-  console.log("importFCNN");
-  console.log("avant");
-  console.log(fcnn);
   var inputText = document.getElementById("importBox").value;
   inputText = ''+inputText.trim().replace(/ +(?= )/g,''); // replace multiple spaces by a single one
   try {
@@ -343,8 +334,6 @@ function importFCNN() {
   } catch (err) {
     document.getElementById("fcnn-display-area").innerHTML = "Erreur à l'importation, réseau invalide. (" + err + ")";
   }
-  console.log("apres");
-  console.log(fcnn);
 }
 
 /**
@@ -434,28 +423,31 @@ function setAllInputsToOne() {
 
 
 ////////////////////////////////////////////////////////
-//
-// Graphic display (begin)
-//
+  //
+  // Graphic display (begin)
+  //
 
 
 
 
-var myDisplayArea = {
-	canvas : document.createElement("canvas"),
-	start : function() {
-		this.canvas.width = Math.floor(window.innerWidth*0.9);
-		this.canvas.height = Math.floor(this.canvas.width*0.5);
-		this.context = this.canvas.getContext("2d");
-		document.body.appendChild(this.canvas);
-	},
+  var myDisplayArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+      this.canvas.width = Math.floor(window.innerWidth*0.9);
+      this.canvas.height = Math.floor(this.canvas.width*0.5);
+      this.context = this.canvas.getContext("2d");
+      this.oncontextmenu = function(e) {
+        return false;
+      };
+      document.body.appendChild(this.canvas);
+    },
 
-	clear : function() {
-	  var ctx = this.context;
-	  ctx.fillStyle = "white";
-	  ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-	}
-};
+    clear : function() {
+      var ctx = this.context;
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+  };
 
 myDisplayArea.start();
 myDisplayArea.clear();
@@ -521,6 +513,25 @@ showBiais.oninput = function() {
   }
 }
 
+var islider = document.getElementById("inputValueSlider");
+var inputValue = null;
+islider.oninput = function() {
+  var drawing = document.getElementById("inputValueAsColor");
+  var ctx = drawing.getContext("2d");
+  ctx.beginPath();
+  ctx.fillStyle = "rgb("+this.value+"," + this.value + "," + this.value + ")";
+  ctx.fillRect(0, 0, 20, 20);
+  ctx.lineWidth = "2";
+  ctx.strokeStyle = "black";
+  ctx.strokeRect(1, 1, 18, 18);
+  var text = document.getElementById("inputValueAsText");
+  var value = Number(this.value) / 255.0;
+  text.innerHTML = "" + value.toFixed(3);
+
+  inputValue = value;
+}
+islider.oninput();
+
 
 
 //
@@ -536,27 +547,26 @@ showBiais.oninput = function() {
 
 
 ////////////////////////////////////////////////////////
-//
-// Mouse control (begin)
-//
+  //
+  // Mouse control (begin)
+  //
 
 
-// Drag detection 
-// Of course it was taken from StackOverflow 
-// https://stackoverflow.com/questions/37239710/detecting-clicks-versus-drags-on-an-html-5-canvas
+  // Drag detection 
+  // Of course it was taken from StackOverflow 
+  // https://stackoverflow.com/questions/37239710/detecting-clicks-versus-drags-on-an-html-5-canvas
 var isDown   = false;   // mouse button is held down
 var isMoving = false;   // we're moving (dragging)
 var radius   = 9 * 9    // radius in pixels, 9 squared
 var firstPos = null;    // keep track of first position
 var actualNeuron = null;
-var forcedValue = null;;
 
 
 function getXY(event) {
-    const rect = myDisplayArea.canvas.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
-    return {x : x, y : y};
+  const rect = myDisplayArea.canvas.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+  return {x : x, y : y};
 }
 
 
@@ -566,10 +576,10 @@ function simpleClick(x, y) {
     // update drag-related variables
     actualNeuron = neuron;
     firstPos = {x:x, y:y};
-    forcedValue = (neuron.value == 1.0) ? 0.0 : 1.0;
 
     // update fcnn and display
-    neuron.update(forcedValue, forcedValue);
+    neuron.update(inputValue, inputValue);
+console.log(neuron);
     fcnn.evaluateWithActualInput();
     fcnn.displaySelf();
   }
@@ -577,6 +587,7 @@ function simpleClick(x, y) {
 
 
 myDisplayArea.canvas.addEventListener('mousedown', function(e) {
+  e.preventDefault();
   var pos = getXY(e);
   isDown = true;           // record mouse state
   isMoving = false;        // reset move state
@@ -591,8 +602,8 @@ myDisplayArea.canvas.addEventListener("mousemove", function(e) {
 
   // calculate distance from click point to current point
   var dx = firstPos.x - pos.x,
-  dy = firstPos.y - pos.y,
-  dist = dx * dx + dy * dy;  // skip square-root (see above)
+    dy = firstPos.y - pos.y,
+    dist = dx * dx + dy * dy;  // skip square-root (see above)
 
   if (dist >= radius) isMoving = true; // 10-4 we're on the move
 
@@ -600,7 +611,8 @@ myDisplayArea.canvas.addEventListener("mousemove", function(e) {
     var neuron = fcnn.getNeuronUnderClick(pos.x, pos.y);
     if (neuron != null && neuron != actualNeuron) {
       actualNeuron = neuron;
-      neuron.update(forcedValue, forcedValue);
+      neuron.update(inputValue, inputValue);
+console.log(neuron);
       fcnn.evaluateWithActualInput();
       fcnn.displaySelf();
     }
