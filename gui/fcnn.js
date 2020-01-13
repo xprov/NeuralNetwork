@@ -99,8 +99,6 @@ class Neuron {
       ctx.stroke();
     }
   }
-
-
 }
 
 class FCNNDisplayOptions {
@@ -127,6 +125,7 @@ class FCNN {
     var layersInText = null;
     this.activationFunctionsName = null;
     var weightsInText = null;
+    var labelsInText = null;
     text.split('\n').forEach( line => {
       if (line.startsWith("layerSizes")) {
         layersInText = line;
@@ -134,15 +133,19 @@ class FCNN {
         this.activationFunctionsName = line.split(" ")[1];
       } else if (line.startsWith("weights")) {
         weightsInText = line;
+      } else if (line.startsWith("labels")) {
+        labelsInText = line.substring(7);
       }
     });
 
     if (layersInText == null) {
       throw "Parsing error. Error reading layers' sizes";
     }
+
     if (this.activationFunctionsName == null) {
       throw "Parsing error. Error reading activation function";
     }
+
     if (weightsInText == null) {
       throw "Parsing error. Error reading weights";
     }
@@ -153,7 +156,9 @@ class FCNN {
     var layers = layersInText.substring(p0+1, p1);
     this.layers = []
     layers.split(',').forEach(k => {this.layers.push(parseInt(k))});
-    this.numLayers = this.layers.length
+    this.numLayers = this.layers.length;
+    this.numInputNeurons = this.layers[0];
+    this.numOutputNeurons = this.layers[this.numLayers-1];
 
     // parse activation function
     this.activationFunction = ActivationFunctions[this.activationFunctionsName];
@@ -208,6 +213,13 @@ class FCNN {
 
     this.displayOptions = new FCNNDisplayOptions();
     this.updateNeuronsPositions();
+
+
+    // Parse labels, if they are specified
+    this.labels = null;
+    if (labelsInText != null) {
+      this.labels = labelsInText.split(",");
+    }
   }
 
   updateNeuronsPositions() {
@@ -289,6 +301,21 @@ class FCNN {
     this.neurons.forEach(layer => {layer.forEach(n => {
       if (this.displayOptions.showBiais || !n.isBiais) n.displaySelf(ctx)
     })});
+
+    // Output neurons' labels
+    if (this.labels != null) {
+      var outputLayer = this.neurons[this.numLayers-1];
+      for (var i=0; i<Math.min(Math.min(this.numOutputNeurons, this.labels.length)); i++) {
+        var label = this.labels[i];
+        var neuron = outputLayer[i];
+        console.log(neuron);
+        console.log(label);
+        var x = neuron.center[0] + 0.75*this.displayOptions.neuronsSize;
+        var y = neuron.bottomRight[1] - 0.2*this.displayOptions.neuronsSize;
+        ctx.font = "" + this.displayOptions.neuronsSize + "px Arial";
+        ctx.fillText(label, x, y);
+      }
+    }
   }
 
   getNeuronUnderClick(x, y) {
@@ -299,7 +326,6 @@ class FCNN {
       }
     }
   }
-
 }
 
 //
