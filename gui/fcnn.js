@@ -312,6 +312,7 @@ class FCNN {
         console.log(label);
         var x = neuron.center[0] + 0.75*this.displayOptions.neuronsSize;
         var y = neuron.bottomRight[1] - 0.2*this.displayOptions.neuronsSize;
+        ctx.fillStyle = "black";
         ctx.font = "" + this.displayOptions.neuronsSize + "px Arial";
         ctx.fillText(label, x, y);
       }
