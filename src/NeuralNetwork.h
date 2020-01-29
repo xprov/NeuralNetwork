@@ -10,7 +10,6 @@
 #include <stdint.h>
 #include <iostream>
 #include <vector>
-#include "SafeVector.h"
 #include "Matrix.h"
 #include "ActivationFunctions.h"
 #include "vectorstream.h"

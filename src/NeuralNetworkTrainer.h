@@ -10,7 +10,6 @@
 
 #include "NeuralNetwork.h"
 #include <fstream>
-#include "SafeVector.h"
 
 namespace BPN
 {
@@ -92,7 +91,7 @@ namespace BPN
         // m_deltas[i] : deltas from layer i to i+1
         std::vector<Matrix>               m_deltas;
         // m_errorGradients[i] error gradients on layer i
-        std::vector< SafeVector<double> > m_errorGradients;
+        std::vector< std::vector<double> > m_errorGradients;
 
         uint32_t                          m_currentEpoch;             // Epoch counter
         double                            m_trainingSetAccuracy;
