@@ -1,11 +1,15 @@
 
 # NeuralNetwork
 
-Simple Back Propagation Neural Network (BPN)
+Back Propagation Neural Network (BPN). Evaluation, training and visulization.
 
-This code is a fork from [Bobby Anguelov's NeuralNetwork](https://github.com/BobbyAnguelov/NeuralNetwork).
+ - This code is a fork from [Bobby Anguelov's NeuralNetwork](https://github.com/BobbyAnguelov/NeuralNetwork).
+ - The code makes use of [Florian Rappl's command parser](https://github.com/FlorianRappl/CmdParser )
 
-The code makes use of [Florian Rappl's command parser](https://github.com/FlorianRappl/CmdParser )
+<kbd>
+  <img src="./images/demoNN.gif">
+</kbd>
+
 
 # Disclaimer
 This code is meant to be a simple implementation of the back-propagation neural network discussed in the tutorial below:
@@ -25,8 +29,8 @@ This project contains three programs :
 
 ## Precompiled binaries
 
-Precompiled executable files for Linux and Windows (both x64) are found in the
-`precompiled` folder.
+Precompiled executable files for Linux and Windows (both for x64 architecture)
+are found in the `precompiled` folder (old versions, not maintained).
 
 ## Compilation
 
@@ -37,8 +41,8 @@ Precompiled executable files for Linux and Windows (both x64) are found in the
  - Using Synaptic Manager, install the required compilation tools
 
 	```
-	sudo apt-get update
-	sudo apt-get install g++ make cmake
+	sudo apt update
+	sudo apt install g++ make cmake
 	```
 
  -  __Compilation__
@@ -52,7 +56,7 @@ Precompiled executable files for Linux and Windows (both x64) are found in the
 
  - __Debug VS Release Mode__
 
-	Since the training of a neural network requires a lot of computational power, one might find useful to compile a debug and a release versions (the release version should run significantly faster):
+	Since training of neural networks requires a lot of computation, one might find useful to compile a debug and a release versions (the release version should run significantly faster):
 	```
 	mkdir debug && cd debug && cmake -DCMAKE_BUILD_TYPE=Debug .. && make -j
 	cd ..
@@ -74,8 +78,8 @@ Precompiled executable files for Linux and Windows (both x64) are found in the
  - Using Synaptic Manager, install the required compilation tools
 
 	```
-	sudo apt-get update
-	sudo apt-get install g++ make
+	sudo apt update
+	sudo apt install g++ make
 	```
 
  - __Compilation__
@@ -96,13 +100,12 @@ Precompiled executable files for Linux and Windows (both x64) are found in the
 ### Compile under Mac
 
 Pretty much the same thing as under Gnu/Linux, just install `cmake` and `g++`
-using `brew` instead of `apt-get`.
+using `brew` instead of `apt`.
 
 
 ### Compile under Windows
 
-Disclaimer: I never use Windows so there might be a simplest way but this is the best I
-could found.
+Disclaimer: I don't know what I'm doing here. If you know a simpler way please let me know.
 
  - Install `Microsoft Visual Studio`
  - Make sure that  _Workload_ named __Desktop development with C++__ is
@@ -114,13 +117,13 @@ could found.
    software to use, select `Visual Studio` or `Visual Studio Version Selector`.
  - In `Visual Studio`, locate the __Solution explorer__ in which you should see
    the `trainBPN` project. Right click on `trainBPN` and select __Build__.
- - DO the same with the `evalNN.vcxproj`.
+ - Do the same with the `evalNN.vcxproj`.
 
 
 
 ## Execution
 
-__For Windows users__: this project tries to follow the [Unix
+__For Windows users__: this project tries to respect the [Unix
 philosophy](https://en.wikipedia.org/wiki/Unix_philosophy), therefor it uses
 command lines arguments. Although, these can be specified within `Visual
 Studio` I suggest you to use a shell. 
