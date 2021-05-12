@@ -45,6 +45,7 @@ namespace BPN
 
   public:
 
+      Network( const std::vector<int>& layerSizes, const ActivationFunction* sigma, const std::string labels );
       Network( const std::vector<int>& layerSizes, const ActivationFunction* sigma );
       Network( std::istream& is );
 
@@ -112,20 +113,17 @@ namespace BPN
       int32_t                     m_numOutputs;      // number of neurons on the output layer
       int32_t                     m_numOnLastHidden; // number of neurons on the last hidden layer
       std::vector<int>            m_layerSizes;      // m_layerSizes[i] is the number of neurons on the i-th layer.
-
-
       typedef std::vector<Neuron> Layer;
       std::vector<Layer>          m_neurons;           // m_neurons[i] is the i-th layer
       Layer*                      m_inputNeurons;      // &m_neurons[0]
       Layer*                      m_lastHiddenNeurons; // &m_neurons[-2] (python notations)
       Layer*                      m_outputNeurons;     // &m_neurons[-1]
-
       std::vector<int32_t>        m_clampedOutputs;
-
       // m_wrigntsByLayer[i] is the matrix of weights from layer i to layer i+1
       std::vector<Matrix>         m_weightsByLayer;
-
       const ActivationFunction*   m_sigma;
+
+      std::string                 m_labels;          // labels for the output nodes
 
   public:
 

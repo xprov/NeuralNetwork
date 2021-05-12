@@ -42,7 +42,7 @@ namespace BPN
             bool        m_useBatchLearning;
 
             // Stopping conditions
-            uint32_t    m_maxEpochs;
+            uint64_t    m_maxEpochs;
             double      m_desiredAccuracy;
 
             // Verbosity
@@ -85,7 +85,7 @@ namespace BPN
                                                                   // learning (don't use for batch)
                                                                   
         double                            m_desiredAccuracy;      // Target accuracy for training
-        uint32_t                          m_maxEpochs;            // Max number of training epochs
+        uint64_t                          m_maxEpochs;            // Max number of training epochs
         bool                              m_useBatchLearning;     // Should we use batch learning
 
         // m_deltas[i] : deltas from layer i to i+1
@@ -93,7 +93,7 @@ namespace BPN
         // m_errorGradients[i] error gradients on layer i
         std::vector< std::vector<double> > m_errorGradients;
 
-        uint32_t                          m_currentEpoch;             // Epoch counter
+        uint64_t                          m_currentEpoch;             // Epoch counter
         double                            m_trainingSetAccuracy;
         double                            m_validationSetAccuracy;
         double                            m_generalizationSetAccuracy;

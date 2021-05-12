@@ -35,12 +35,10 @@ using BPN::operator>>;
 
 int main( int argc, char* argv[] )
 {
-  //BPN::Network nin( std::cin );
-  //std::cout << nin << std::endl;
-  //exit(0);
 
-
-
+  //
+  // Definition of the command line arguments
+  //
   cli::Parser cmdParser( argc, argv );
   cmdParser.set_required<std::string>( "d", "dataFile", "Path to training data file." );
   cmdParser.set_optional<std::string>( "f", "format", "numberList", "Format of the training data file.\n"
@@ -62,11 +60,13 @@ int main( int argc, char* argv[] )
                                  "     ReLU,       Rectified linear unit.\n"
                                  "     LeakyReLY,  Leaky ReLU, like ReLU but with small gradiant (1/100)\n"
                                  "                 when the unit is not active.");
-  cmdParser.set_optional<uint32_t>( "m", "maxEpoch", 100, "Maximum num of iterations." );
+  cmdParser.set_optional<uint64_t>( "m", "maxEpoch", 100, "Maximum num of iterations (-1 stands for 2^64-1)." );
   cmdParser.set_optional<double>( "r", "learningRate", 0.01, "Multiplicative coefficient on error gradient" );
   cmdParser.set_optional<double>( "mom", "momentum", 0.9, "Multiplicative coefficient applied on previous error delta when non using batch learning." );
   cmdParser.set_optional<bool>( "b", "batchLearning", false, "Use batch learning (1 : yes, 0 : no)." );
   cmdParser.set_optional<double>( "a", "accuracy", 95, "Desired accuracy. Training stops when the desired accuracy is obtained." );
+  cmdParser.set_optional<std::string>( "L", "labels", "", "Labels for output nodes. Comma separated list of work without white spaces.\n"
+                                     "   Only for new networks and is only used with the GUI visualization tool.");
   cmdParser.set_optional<int32_t>( "v", "verbose", 1, "Verbosity level.\n     Level 0: quiet mode.\n     Level 1: prints training evolution.\n     Level 2: prints NN at initialization and at the end.\n     Level 3: prints NN at every iteration of the learning phase." );
 
   if ( !cmdParser.run() )
@@ -75,31 +75,41 @@ int main( int argc, char* argv[] )
       return 1;
     }
 
+  //
+  // Get values from the command line parser
+  // 
   std::string const trainingDataPath   = cmdParser.get<std::string>( "d" );
   std::string const format             = cmdParser.get<std::string>( "f" );
   std::string const layers             = cmdParser.get<std::string>( "l" );
   std::string const importFile         = cmdParser.get<std::string>( "i" );
   std::string const exportFile         = cmdParser.get<std::string>( "e" );
   std::string const activationFunction = cmdParser.get<std::string>( "s" );
-  uint32_t const    maxEpoch           = cmdParser.get<uint32_t>( "m" );
+  uint64_t const    maxEpoch           = cmdParser.get<uint64_t>( "m" );
   double            learningRate       = cmdParser.get<double>( "r" );
   double            momentum           = cmdParser.get<double>( "mom" );
   bool              batchLearning      = cmdParser.get<bool>( "b" );
   double            accuracy           = cmdParser.get<double>( "a" );
+  std::string const labels             = cmdParser.get<std::string>( "L" );
   int32_t           verbosity          = cmdParser.get<int32_t>( "v" );
 
+  // If the user wants to create a new neural network then he must specify it's
+  // shape (number of layers and their sizes). Otherwise, an existing neural
+  // network must be imported. 
+  // Verify that the user has specified at least one of the two.
   if ( layers.compare("[]") == 0 && importFile.compare("") == 0 )
     {
       std::cerr << "At least one parameter among -l or -i must be specified. (See help for more impormations)" << std::endl;
       exit(1);
     }
 
+  // Verify that the user has specified not provided both.
   if ( layers.compare("[]") != 0 && importFile.compare("") != 0 )
     {
       std::cerr << "Only one parameter among -l and -i may be specified. (See help for more impormations)" << std::endl;
       exit(1);
     }
 
+  // Validation of the input format : eigher `numberList` or `text`.
   BPN::InputDataFormat inputDataFormat;
   if ( format.compare("numberList") == 0 )
     inputDataFormat = BPN::numberList;
@@ -112,27 +122,27 @@ int main( int argc, char* argv[] )
   BPN::ActivationFunction* sigma = BPN::ActivationFunction::deserialize( activationFunction );
 
   // Create neural network
-  BPN::Network* nn = NULL;;
+  BPN::Network* nn = NULL;
 
-  if ( layers.compare("[]") != 0 )
+  if ( layers.compare("[]") != 0 ) // new network
     {
-
       // Read layers sizes. The first layer is the input layer, the last layer
       // is the output. All other layers are hidden.
       std::vector<int> layerSizes;
       std::stringstream ss(layers);
       ss >> layerSizes;
 
-      nn = new BPN::Network( layerSizes, sigma );
+      nn = new BPN::Network( layerSizes, sigma, labels );
     }
-  else if ( importFile.compare("") != 0 )
+  else if ( importFile.compare("") != 0 ) // existing network
     {
-      if ( importFile.compare("-") == 0 )
+      if ( importFile.compare("-") == 0 ) // read on stdin
         {
           nn = new BPN::Network( std::cin );
         }
       else
         {
+          // import network from text file
           std::fstream fs;
           fs.open( importFile, std::fstream::in );
           nn = new BPN::Network( fs );
@@ -146,6 +156,8 @@ int main( int argc, char* argv[] )
       std::cout << *nn << std::endl;
     }
 
+  // 
+  // Data from the data file is loaded into memory
   BPN::DataReader dataReader( trainingDataPath, 
                              nn->getNumInputs(), 
                              nn->getNumOutputs(), 
@@ -174,35 +186,49 @@ int main( int argc, char* argv[] )
     }
 
 
+  //
   // Create neural network trainer
+  // 
   BPN::NetworkTrainer::Settings trainerSettings;
-  trainerSettings.m_learningRate = learningRate;
-  trainerSettings.m_momentum = momentum;
+  trainerSettings.m_learningRate     = learningRate;
+  trainerSettings.m_momentum         = momentum;
   trainerSettings.m_useBatchLearning = batchLearning;
-  trainerSettings.m_maxEpochs = maxEpoch;
-  trainerSettings.m_desiredAccuracy = accuracy;
-  trainerSettings.m_verbosity = verbosity;
+  trainerSettings.m_maxEpochs        = maxEpoch;
+  trainerSettings.m_desiredAccuracy  = accuracy;
+  trainerSettings.m_verbosity        = verbosity;
 
   BPN::NetworkTrainer trainer( trainerSettings, nn );
+
+  //
+  // All the real work is done here
+  // 
   trainer.Train( data );
+  // It's all over now
+
   if ( verbosity >= 2) 
     {
       std::cout << *nn << std::endl;
     }
 
+  // 
+  // If required, the network is exported
   if ( exportFile.compare("") != 0 )
     {
-      if ( exportFile.compare("-") == 0 )
+      if ( exportFile.compare("-") == 0 ) 
         {
+          // export to stdout
           std::cout << nn->serialize() << std::endl;
         }
       else
         {
+          // export to a text file
           std::fstream fs;
           fs.open( exportFile, std::fstream::out );
           fs << nn->serialize() << std::endl;
         }
     }
+
+  // Useless but hey, best practices are best practices. 
   delete nn;
   return 0;
 }

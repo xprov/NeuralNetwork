@@ -21,9 +21,10 @@
 
 namespace BPN
 {
-  Network::Network(const std::vector<int>& layerSizes, const ActivationFunction* sigma) 
+  Network::Network( const std::vector<int>& layerSizes, const ActivationFunction* sigma, const std::string labels )
     : m_layerSizes(layerSizes)
       , m_sigma(sigma)
+      , m_labels(labels)
     {
       assert(layerSizes.size() >= 3);
       m_numLayers       = m_layerSizes.size();
@@ -32,6 +33,11 @@ namespace BPN
       m_numOnLastHidden = m_layerSizes[m_numLayers-2];
       InitializeNetwork();
       InitializeWeights();
+    }
+
+  Network::Network(const std::vector<int>& layerSizes, const ActivationFunction* sigma) 
+    : Network::Network(layerSizes, sigma, std::string(""))
+    {
     }
 
 
@@ -252,6 +258,17 @@ namespace BPN
                 }
             }
         }
+      
+      // Read labels (optionnal)
+      is >> s;
+      if ( s.compare( "labels" ) != 0 )
+        {
+          m_labels = std::string(""); // no labels
+        }
+      else
+        {
+          is >> m_labels;
+        }
     }
 
   std::string Network::serialize() const
@@ -269,6 +286,11 @@ namespace BPN
                   ss << ' ' << m_weightsByLayer[i](actualIdx, nextIdx);
                 }
             }
+        }
+      ss << '\n';
+      if ( m_labels.length() > 0 )
+        {
+          ss << "labels " << m_labels << '\n';
         }
       return ss.str();
     }
@@ -288,7 +310,6 @@ namespace BPN
 
 std::ostream& operator<<( std::ostream& os, const BPN::Network& n )
   {
-    //return os;
     os << n.selfDisplay();
     return os;
   }
