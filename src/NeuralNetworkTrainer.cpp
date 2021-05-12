@@ -41,7 +41,7 @@ namespace BPN
       }
 
     // m_errorGradients[0] is not used... dummy value to fill the spot
-    m_errorGradients.push_back(SafeVector<double>());
+    m_errorGradients.push_back(std::vector<double>());
     for (int32_t i=1; i < m_pNetwork->m_numLayers; ++i) 
       {
         int layerSize = m_pNetwork->m_layerSizes[i];
@@ -49,7 +49,7 @@ namespace BPN
           {
             layerSize += 1; // add one for bias
           }
-        m_errorGradients.push_back( SafeVector<double>() );
+        m_errorGradients.push_back( std::vector<double>() );
         m_errorGradients[i].resize( layerSize, 0.0 );
       }
 
