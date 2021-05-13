@@ -6,12 +6,12 @@ Back Propagation Neural Network (BPN). Evaluation, training and visulization.
  - This code is a fork from [Bobby Anguelov's NeuralNetwork](https://github.com/BobbyAnguelov/NeuralNetwork).
  - The code makes use of [Florian Rappl's command parser](https://github.com/FlorianRappl/CmdParser )
 
+ - The following example shows a neural network trained using the <a href="http://yann.lecun.com/exdb/mnist/">MNIST database of hand written digits</a>. <a href="http://xprov.org/gui/fcnn.html">Try it yourself</a>.
+ 
 <kbd>
   <img src="./images/demoNN.gif">
 </kbd>
 
- - This example show a neural network trained using the MNIST database of hand written digits. <a href="http://xprov.org/gui/fcnn.html">Try it yourself</a>.
- 
 
 # Disclaimer
 This code is meant to be a simple implementation of the back-propagation neural network discussed in the tutorial below:
