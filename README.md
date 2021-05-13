@@ -10,6 +10,8 @@ Back Propagation Neural Network (BPN). Evaluation, training and visulization.
   <img src="./images/demoNN.gif">
 </kbd>
 
+ - This example show a neural network trained using the MNIST database of hand written digits. <a href="http://xprov.org/gui/fcnn.html">Try it yourself</a>.
+ 
 
 # Disclaimer
 This code is meant to be a simple implementation of the back-propagation neural network discussed in the tutorial below:
