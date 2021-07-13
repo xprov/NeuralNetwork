@@ -32,7 +32,7 @@ This project contains three programs :
 ## Precompiled binaries
 
 Precompiled executable files for Linux and Windows (both for x64 architecture)
-are found in the `precompiled` folder (old versions, not maintained).
+are found in the `precompiled` folder (older versions, not maintained).
 
 ## Compilation
 
@@ -143,7 +143,7 @@ difference is to use '\\' instead of'/' between folder names.
 
 ### Train a BPN
 Let's train a Network using data from the
-``Example/threeShapes/data/threeShapes.csv`` file. In this example, the input
+``Examples/threeShapes/data/threeShapes.csv`` file. In this example, the input
 are binary pictures of size 40x40. Consequently, there needs to be 1600 input
 neurons on the first layer. The output layer must have size 3 since the inputs
 are classified in three categories :
@@ -157,8 +157,8 @@ Here we choose to have 3 hidden layers of size 20, so the "-l" argument is
 at least 90% accuracy on the generalization set.
 
 ```
-./trainBPN -d ../Example/threeShapes/data/threeShapes.csv -l 1600,20,20,20,3 -a 90 -e myTrainedNN
-Input file: ../Example/threeShapes/data/threeShapes.csv
+./trainBPN -d ../Examples/threeShapes/data/threeShapes.csv -l 1600,20,20,20,3 -a 90 -e myTrainedNN
+Input file: ../Examples/threeShapes/data/threeShapes.csv
 Read complete: 100000 inputs loaded
 
  Neural Network Training Starting: 
@@ -182,7 +182,7 @@ Note that in the above example, the trained network is exported to the file ``my
 
 Open the file `gui/fcnn.html` in you favorite browser. Instruction are displayed within the page.
 For example, the following images show an import of the pre-trainted network
-`Example/slope/trainedNN/900_20_20_20_4`. Input neurons are displayed as a grid
+`Examples/slope/trainedNN/900_20_20_20_4`. Input neurons are displayed as a grid
 since the inputs are images, each pixel provides the value of one input neuron.
 The output neurons have the following interpretation:
 
@@ -239,6 +239,7 @@ The addition of a new activation function requires 3 steps:
 
 When building a new neural networks, random weights are generated in function
 ``Network::InitializeWeights()`` found in file __src/NeuralNetwork.cpp__. 
+
 
 
 
