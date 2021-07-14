@@ -1,7 +1,7 @@
 //-------------------------------------------------------------------------
 // Simple back-propagation neural network example
-// 2017 - Bobby Anguelov
-// 2018 - Xavier Provençal
+// Copyright (C) 2017  Bobby Anguelov
+// Copyright (C) 2018  Xavier Provençal
 // MIT license: https://opensource.org/licenses/MIT
 //-------------------------------------------------------------------------
 //
@@ -11,7 +11,7 @@
 #include <iostream>
 #include <string.h>
 
-namespace BPN 
+namespace bpn 
 {
 
   class Matrix

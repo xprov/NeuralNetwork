@@ -1,7 +1,7 @@
 //-------------------------------------------------------------------------
 // Simple back-propagation neural network example
-// 2017 - Bobby Anguelov
-// 2018 - Xavier Provençal
+// Copyright (C) 2017  Bobby Anguelov
+// Copyright (C) 2018  Xavier Provençal
 // MIT license: https://opensource.org/licenses/MIT
 //-------------------------------------------------------------------------
 // A simple neural network supporting only a single hidden layer
@@ -16,7 +16,7 @@
 
 //-------------------------------------------------------------------------
 
-namespace BPN 
+namespace bpn 
 {
 
   //-------------------------------------------------------------------------
@@ -27,7 +27,7 @@ namespace BPN
       {}
       double activation; 
       double value; // = Sigma(activation)
-      friend std::ostream& operator<<( std::ostream& os, const BPN::Neuron& n );
+      friend std::ostream& operator<<( std::ostream& os, const bpn::Neuron& n );
     };
 
   class Network
@@ -128,7 +128,7 @@ namespace BPN
   public:
 
       std::string selfDisplay() const;
-      friend std::ostream& operator<<( std::ostream& os, const BPN::Network& n );
+      friend std::ostream& operator<<( std::ostream& os, const bpn::Network& n );
     };
 
 }

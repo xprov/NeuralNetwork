@@ -2,6 +2,8 @@
 // Simple back-propagation neural network example
 // 2017 - Bobby Anguelov
 // 2018 - Xavier Provençal
+// Copyright (C) 2017  Bobby Anguelov
+// Copyright (C) 2018  Xavier Provençal
 // MIT license: https://opensource.org/licenses/MIT
 //-------------------------------------------------------------------------
 
@@ -19,7 +21,7 @@
 
 //-------------------------------------------------------------------------
 
-namespace BPN
+namespace bpn
 {
   Network::Network( const std::vector<int>& layerSizes, const ActivationFunction* sigma, const std::string labels )
     : m_layerSizes(layerSizes)
@@ -308,13 +310,13 @@ namespace BPN
     }
 
 
-std::ostream& operator<<( std::ostream& os, const BPN::Network& n )
+std::ostream& operator<<( std::ostream& os, const bpn::Network& n )
   {
     os << n.selfDisplay();
     return os;
   }
 
-std::ostream& operator<<( std::ostream& os, const BPN::Neuron& n) 
+std::ostream& operator<<( std::ostream& os, const bpn::Neuron& n) 
   {
     os << "(" << n.activation << ", " << n.value << ")";
     return os;

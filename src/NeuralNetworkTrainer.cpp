@@ -1,7 +1,7 @@
 //-------------------------------------------------------------------------
 // Simple back-propagation neural network example
-// 2017 - Bobby Anguelov
-// 2018 - Xavier Provençal
+// Copyright (C) 2017  Bobby Anguelov
+// Copyright (C) 2018  Xavier Provençal
 // MIT license: https://opensource.org/licenses/MIT
 //-------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@
 
 //-------------------------------------------------------------------------
 
-namespace BPN
+namespace bpn
 {
   NetworkTrainer::NetworkTrainer( Settings const& settings, Network* pNetwork )
     : m_pNetwork( pNetwork )
@@ -199,8 +199,8 @@ namespace BPN
       // Modify deltas between the last hidden layer and output layers
       //---------------------------------------------------------------------
       int32_t numLayers = m_pNetwork->m_numLayers;
-      BPN::Network::Layer& lastHiddenNeurons = *m_pNetwork->m_lastHiddenNeurons;
-      BPN::Network::Layer& outputNeurons = *m_pNetwork->m_outputNeurons;
+      bpn::Network::Layer& lastHiddenNeurons = *m_pNetwork->m_lastHiddenNeurons;
+      bpn::Network::Layer& outputNeurons = *m_pNetwork->m_outputNeurons;
 
       for ( auto outputIdx = 0; outputIdx < m_pNetwork->m_numOutputs; ++outputIdx )
         {

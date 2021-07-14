@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------
 // Simple back-propagation neural network example
-// 2018 - Xavier Provençal
+// Copyright (C) 2021 Xavier Provençal
 // MIT license: https://opensource.org/licenses/MIT
 //-------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@
 #include <limits>
 
 
-namespace BPN
+namespace bpn
 {
     enum class ActivationFunctionType
     {

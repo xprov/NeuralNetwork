@@ -1,13 +1,13 @@
 //-------------------------------------------------------------------------
 // Simple back-propagation neural network example
-// 2018 - Xavier Provençal
+// Copyright (C) 2021  Xavier Provençal
 // MIT license: https://opensource.org/licenses/MIT
 //-------------------------------------------------------------------------
 
 
 #include "ActivationFunctions.h"
 
-namespace BPN {
+namespace bpn {
 
     ActivationFunction* ActivationFunction::deserialize(const std::string& s)
       {

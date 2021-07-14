@@ -1,7 +1,7 @@
 //-------------------------------------------------------------------------
 // Simple back-propagation neural network example
-// 2017 - Bobby Anguelov
-// 2018 - Xavier Provençal
+// Copyright (C) 2017  Bobby Anguelov
+// Copyright (C) 2018  Xavier Provençal
 // MIT license: https://opensource.org/licenses/MIT
 //-------------------------------------------------------------------------
 
@@ -28,14 +28,14 @@
 #endif
 
 // Operators from "vectorstream.h"
-using BPN::operator<<;
-using BPN::operator>>;
+using bpn::operator<<;
+using bpn::operator>>;
 
 //-------------------------------------------------------------------------
 
 int main( int argc, char* argv[] )
 {
-  //BPN::Network nin( std::cin );
+  //bpn::Network nin( std::cin );
   //std::cout << nin << std::endl;
   //exit(0);
 
@@ -65,17 +65,17 @@ int main( int argc, char* argv[] )
   std::string const importFile         = cmdParser.get<std::string>( "i" );
   int32_t           verbosity          = cmdParser.get<int32_t>( "v" );
 
-  BPN::InputDataFormat inputDataFormat;
+  bpn::InputDataFormat inputDataFormat;
   if ( format.compare("numberList") == 0 )
-    inputDataFormat = BPN::numberList;
+    inputDataFormat = bpn::numberList;
   else if ( format.compare("text") == 0 )
-    inputDataFormat = BPN::text;
+    inputDataFormat = bpn::text;
   else
     throw std::runtime_error("Invalid format for input data. For more help use --help or -h.");
 
   std::fstream fs;
   fs.open( importFile, std::fstream::in );
-  BPN::Network* nn = new BPN::Network( fs );
+  bpn::Network* nn = new bpn::Network( fs );
 
 
   if (verbosity >= 2)
@@ -83,7 +83,7 @@ int main( int argc, char* argv[] )
       std::cout << *nn << std::endl;
     }
 
-  BPN::DataReader dataReader( "-",
+  bpn::DataReader dataReader( "-",
                              nn->getNumInputs(), 
                              nn->getNumOutputs(), 
                              inputDataFormat, 

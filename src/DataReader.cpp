@@ -1,7 +1,7 @@
 //-------------------------------------------------------------------------
 // Simple back-propagation neural network example
-// 2017 - Bobby Anguelov
-// 2018 - Xavier Provençal
+// Copyright (C) 2017  Bobby Anguelov
+// Copyright (C) 2018  Xavier Provençal
 // MIT license: https://opensource.org/licenses/MIT
 //-------------------------------------------------------------------------
 
@@ -51,12 +51,12 @@ void textToListOfDouble( std::vector<double>& l, const std::string& s)
 }
 
 
-namespace BPN
+namespace bpn
 {
   DataReader::DataReader( std::string const& filename, 
                           int32_t numInputs, 
                           int32_t numOutputs,
-                          BPN::InputDataFormat format,
+                          bpn::InputDataFormat format,
                           int32_t verbosity )
     : m_filename( filename ), 
     m_numInputs( numInputs ), 
@@ -85,7 +85,7 @@ namespace BPN
       inputValues.clear();
       std::string line;
       std::getline( *m_dataStream, line );
-      if ( m_dataFormat == BPN::numberList )
+      if ( m_dataFormat == bpn::numberList )
         {
           std::stringstream ss;
           insertListInStream( ss, line, "," );
@@ -96,7 +96,7 @@ namespace BPN
               inputValues.push_back( d );
             }
         }
-      else // ( m_dataType == BPN::text )
+      else // ( m_dataType == bpn::text )
         {
           std::vector<double> inputs;
           textToListOfDouble( inputs, line );
@@ -134,7 +134,7 @@ namespace BPN
           entries.push_back( TrainingEntry() );
           TrainingEntry& entry = entries.back();
 
-          if ( m_dataFormat == BPN::numberList )
+          if ( m_dataFormat == bpn::numberList )
             {
               std::stringstream ss;
               insertListInStream( ss, line, "," );
@@ -151,7 +151,7 @@ namespace BPN
                   entry.m_expectedOutputs.push_back( x );
                 }
             }
-          else // ( m_dataType == BPN::text )
+          else // ( m_dataType == bpn::text )
             {
               if (line[0] != '"')
                 {

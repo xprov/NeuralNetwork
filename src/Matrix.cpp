@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------
 // Simple back-propagation neural network example
-// 2018 - Xavier Provençal
+// Copyright (C) 2021  Xavier Provençal
 // MIT license: https://opensource.org/licenses/MIT
 //-------------------------------------------------------------------------
 //
@@ -10,7 +10,7 @@
 #include <iomanip>
 #include <limits>
 
-namespace BPN
+namespace bpn
 {
 
   std::ostream& operator<<(std::ostream& os, const Matrix& m)
