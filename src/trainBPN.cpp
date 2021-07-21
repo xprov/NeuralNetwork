@@ -123,7 +123,7 @@ int main( int argc, char* argv[] )
   // If no arguments are given then read the default config file.
   if (argc == 1)
     {
-      std::cout << "No arguments given. Reading default configuration file `" 
+      std::cout << "No arguments given --> reading default configuration file `" 
         << DEFAULTCONFIGURATIONFILENAME << "`.\n" << std::endl;
       configurationFile = DEFAULTCONFIGURATIONFILENAME;
       useConfigurationFile = true;

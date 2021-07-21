@@ -26,7 +26,7 @@ class Neuron {
     this.value = value;
   }
 
-  // todo fcnn should compute all there and simply affect the values to each neuron
+  // todo fcnn should compute all these and simply affect the values to each neuron
   updatePosition() {
     var opt = this.fcnn.displayOptions;
     var size = opt.neuronsSize;
