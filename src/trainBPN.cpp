@@ -28,7 +28,7 @@
 #pragma warning(pop)
 #endif
 
-const char* DEFAULTCONFIGURATIONFILENAME = "nn.conf";
+const char* DEFAULTCONFIGURATIONFILENAME = "config.txt";
 
 // Operators from "vectorstream.h"
 using bpn::operator<<;
@@ -123,7 +123,7 @@ int main( int argc, char* argv[] )
   // If no arguments are given then read the default config file.
   if (argc == 1)
     {
-      std::cout << "No arguments given --> reading default configuration file `" 
+      std::cout << "No arguments --> reading default configuration file `" 
         << DEFAULTCONFIGURATIONFILENAME << "`.\n" << std::endl;
       configurationFile = DEFAULTCONFIGURATIONFILENAME;
       useConfigurationFile = true;
@@ -158,7 +158,7 @@ int main( int argc, char* argv[] )
       importFile         = cfParser.get<std::string>( "import", "" );
       exportFile         = cfParser.get<std::string>( "export", "" );
       activationFunction = cfParser.get<std::string>( "activation", "Sigmoid(1)" );
-      maxEpoch           = cfParser.get<uint64_t>( "maxEpock", 100 );
+      maxEpoch           = cfParser.get<uint64_t>( "maxEpoch", 100 );
       learningRate       = cfParser.get<double>( "learningRate", 0.01 );
       momentum           = cfParser.get<double>( "momentum", 0.9 );
       batchLearning      = cfParser.get<bool>( "batchLearning", 0 );
@@ -268,9 +268,11 @@ int main( int argc, char* argv[] )
                              inputDataFormat, 
                              verbosity );
 
+  std::cout << "Reading data from file `" << trainingDataPath << "`" << std::endl;
   bpn::TrainingData data;
   if ( !dataReader.readTraningData( data ) )
     {
+      std::cerr << "Data error" << std::endl;
       return 1;
     }
   if ( verbosity >= 1 )
@@ -278,7 +280,7 @@ int main( int argc, char* argv[] )
       int nbTraining = data.m_trainingSet.size();
       int nbGeneralization = data.m_generalizationSet.size();
       int nbValidation = data.m_validationSet.size();
-      std::cout << " Training data read successfully:\n";
+      std::cout << "Training data read successfully:\n";
       std::cout << "==========================================================================\n"
         << " Input data file: " << trainingDataPath << "\n"
         << " Read complete: " << nbTraining + nbGeneralization + nbValidation << " inputs loaded" 

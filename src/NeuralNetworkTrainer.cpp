@@ -71,7 +71,7 @@ namespace bpn
 
       if (m_verbosity >= 1)
         {
-          std::cout	<< std::endl << " Neural Network Training Starting: " << std::endl
+          std::cout	<< "\n\n"
             << "==========================================================================" 
             << std::endl
             << " Learning Rate: " << m_learningRate 
