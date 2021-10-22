@@ -10,7 +10,7 @@
 ### 
 ### This information is mandatory.
 ###
-datafile = ../Examples/MNIST/mnist_dataset.csv
+datafile = mnist_dataset.csv
 
 ### Format of the training data file.
 ###      numberList, Comma separated list of numbers. The first ones are the
