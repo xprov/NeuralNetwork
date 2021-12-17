@@ -226,6 +226,90 @@ class FCNN {
     this.neurons.forEach( layer => {layer.forEach( n => {n.updatePosition();})});
   }
 
+  moveInputValuesUp() {
+    var input = [];
+    if (this.displayOptions.inputDisposition == "column") {
+      var n = this.numInputNeurons;
+      for (var i=0; i<n-1; i++) {
+        input[i] = this.neurons[0][i+1].activation;
+      }
+      input[n-1] = this.neurons[0][0].activation;
+    } else {
+      // square display
+      var N = this.numInputNeurons;
+      var n = Math.ceil(Math.sqrt(N));
+      for (var i=0; i<N-n; i++) {
+        input[i] = this.neurons[0][i+n].activation;
+      }
+      for (var i=0; i<n; i++) {
+        input[N-n+i] = this.neurons[0][i].activation;
+      }
+    }
+    this.evaluateWithNewInput(input);
+    fcnn.displaySelf();
+  }
+
+  moveInputValuesDown() {
+    var input = [];
+    if (this.displayOptions.inputDisposition == "column") {
+      var n = this.numInputNeurons;
+      for (var i=1; i<n; i++) {
+        input[i] = this.neurons[0][i-1].activation;
+      }
+      input[0] = this.neurons[0][n-1].activation;
+    } else {
+      // square display
+      var N = this.numInputNeurons;
+      var n = Math.ceil(Math.sqrt(N));
+      for (var i=0; i<n; i++) {
+        input[i] = this.neurons[0][N-n+i].activation;
+      }
+      for (var i=n; i<N; i++) {
+        input[i] = this.neurons[0][i-n].activation;
+      }
+    }
+    this.evaluateWithNewInput(input);
+    fcnn.displaySelf();
+  }
+
+  moveInputValuesLeft() {
+    var input = [];
+    if (this.displayOptions.inputDisposition == "column") {
+      return ; // nothing to do
+    }
+    // square display
+    var N = this.numInputNeurons;
+    var n = Math.ceil(Math.sqrt(N));
+    for (var i=0; i<N; i++) {
+      if (i % n != n-1) {
+        input[i] = this.neurons[0][i+1].activation;
+      } else {
+        input[i] = this.neurons[0][i-(n-1)].activation;
+      }
+    }
+    this.evaluateWithNewInput(input);
+    fcnn.displaySelf();
+  }
+
+  moveInputValuesRight() {
+    var input = [];
+    if (this.displayOptions.inputDisposition == "column") {
+      return ; // nothing to do
+    }
+    // square display
+    var N = this.numInputNeurons;
+    var n = Math.ceil(Math.sqrt(N));
+    for (var i=0; i<N; i++) {
+      if (i % n == 0) {
+        input[i] = this.neurons[0][i+(n-1)].activation;
+      } else {
+        input[i] = this.neurons[0][i-1].activation;
+      }
+    }
+    this.evaluateWithNewInput(input);
+    fcnn.displaySelf();
+  }
+
   /**
    * Assing the given values to the input neurons and updates all layers
    * consequently.
@@ -308,8 +392,8 @@ class FCNN {
       for (var i=0; i<Math.min(Math.min(this.numOutputNeurons, this.labels.length)); i++) {
         var label = this.labels[i];
         var neuron = outputLayer[i];
-        console.log(neuron);
-        console.log(label);
+        //console.log(neuron);
+        //console.log(label);
         var x = neuron.center[0] + 0.75*this.displayOptions.neuronsSize;
         var y = neuron.bottomRight[1] - 0.2*this.displayOptions.neuronsSize;
         ctx.fillStyle = "black";
@@ -435,8 +519,22 @@ function setAllInputsToOne() {
   document.getElementById("evaluateButton").click();
 }
 
-//
-// Page interaction (begin)
+function moveLeft() {
+  fcnn.moveInputValuesLeft();
+}
+
+function moveDown() {
+  fcnn.moveInputValuesDown();
+}
+
+function moveUp() {
+  fcnn.moveInputValuesUp();
+}
+
+function moveRight() {
+  fcnn.moveInputValuesRight();
+}
+
 //
 ////////////////////////////////////////////////////////
 
@@ -606,7 +704,7 @@ function simpleClick(x, y) {
 
     // update fcnn and display
     neuron.update(inputValue, inputValue);
-console.log(neuron);
+    //console.log(neuron);
     fcnn.evaluateWithActualInput();
     fcnn.displaySelf();
   }
@@ -639,7 +737,7 @@ myDisplayArea.canvas.addEventListener("mousemove", function(e) {
     if (neuron != null && neuron != actualNeuron) {
       actualNeuron = neuron;
       neuron.update(inputValue, inputValue);
-console.log(neuron);
+      //console.log(neuron);
       fcnn.evaluateWithActualInput();
       fcnn.displaySelf();
     }
