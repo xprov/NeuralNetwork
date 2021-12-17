@@ -78,8 +78,7 @@ Cliquez sur une cellule en entrée (à gauche) pour modifier sa valeur (noir : 0
     <td></td>
     <td><input type="checkbox" id="showConnexions" name="showConnexions" value="showConnexions"></td>
     <td>Afficher les liens</td>
-    <td></td>
-    <td><button id="setToZero" onclick="setAllInputsToZero()">Tout mettre à zéro</button> 
+    <td><button id="setToZero" onclick="setAllInputsToZero()">Tout mettre à zéro</button> </td>
   </tr>
   <tr>
     <td>Espacement vertical</td>
@@ -87,19 +86,35 @@ Cliquez sur une cellule en entrée (à gauche) pour modifier sa valeur (noir : 0
     <td></td>
     <td><input type="checkbox" id="showBiais" name="showBiais" value="showBiais"></td>
     <td>Afficher les biais</td>
-    <td></td>
-    <td><button id="setToOne" onclick="setAllInputsToOne()">Tout mettre à un</button> 
+    <td><button id="setToOne" onclick="setAllInputsToOne()">Tout mettre à un</button> </td>
   </tr>
   <tr>
     <td>Taille des neurones</td>
     <td><input type="range" min="1" max="50" value="15" class="slider" id="neuronsSizeSlider"></td>
+    <td> </td>
+    <td> </td>
+    <td>Translater les valeurs de l'entrée </td>
+    <td>
+      <button id="button_moveLeft"  onclick="moveLeft()"  > ← </button>
+      <button id="button_moveDown"  onclick="moveDown()" > ↓ </button>
+      <button id="button_moveUp"    onclick="moveUp()"    > ↑ </button>
+      <button id="button_moveRight" onclick="moveRight()" > → </button> 
+    </td>
   </tr>
 <tr> 
   <td>Disposition des neurones d'entrée</td>
   <td> 
-    <input type="radio" id="radioDispositionColumn" name="radioDispo" value="column" checked="checked"> Colonne
-    <input type="radio" id="radioDispositionSquare" name="radioDispo" value="square"> Carré
+    <input type="radio" id="radioDispositionColumn" name="radioDispo" value="column"> Colonne
+    <input type="radio" id="radioDispositionSquare" name="radioDispo" value="square" checked="checked"> Carré
   </td>
+  <td></td>
+  <td></td>
+    <td>Outils morphologies </td>
+    <td>
+      <button id="button_dilatation" onclick="dilatation()"> Dilatation </button>
+      <button id="button_erosion"    onclick="erosion()">    Érosion    </button>
+      <button id="button_treshold"   onclick="treshold()">   Seuil      </button>
+    </td>
 </tr>
 <tr> 
   <td>Valeur à assigner aux neurones</td>
@@ -109,6 +124,11 @@ Cliquez sur une cellule en entrée (à gauche) pour modifier sa valeur (noir : 0
   </td>
   <td>
   <div id="inputValueAsText"></div>
+  </td>
+  <td> </td>
+  <td> </td>
+  <td> 
+    <input type="range" min="0" max="255" value="255" class="slider" id="morphologicalFactorSlider">
   </td>
 </tr>
 </table>
