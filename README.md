@@ -29,10 +29,6 @@ This project contains three programs :
  - `evalNN` evaluates a BPN on given entries (native C++).
  - a graphic interface for the visualization of a BPN (HTML5 + JS).
 
-## Precompiled binaries
-
-Precompiled executable files for Linux and Windows (both for x64 architecture)
-are found in the `precompiled` folder (older versions, not maintained).
 
 ## Compilation
 
