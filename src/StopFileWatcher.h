@@ -1,7 +1,6 @@
 #pragma once
 
 #include <fstream>
-#include <unistd.h>
 #include <iostream>
 
 class StopFileWatcher 
