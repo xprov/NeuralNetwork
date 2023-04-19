@@ -15,6 +15,7 @@
 #include "DataReader.h"
 #include "Matrix.h"
 #include "vectorstream.h"
+#include "StopFileWatcher.h"
 
 #if _MSC_VER
 #pragma warning(push, 0)
@@ -85,6 +86,10 @@ void configureCmdParser(cli::Parser& cmdParser)
 
 int main( int argc, char* argv[] )
 {
+
+
+  StopFileWatcher::init("myStopFile");
+
 
   //
   // Parameters

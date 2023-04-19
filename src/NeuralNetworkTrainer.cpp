@@ -6,6 +6,7 @@
 //-------------------------------------------------------------------------
 
 #include "NeuralNetworkTrainer.h"
+#include "StopFileWatcher.h"
 #include <string.h>
 #include <assert.h>
 #include <iostream>
@@ -87,9 +88,11 @@ namespace bpn
       // Train network using training dataset for training and generalization dataset for testing
       //--------------------------------------------------------------------------------------------------------
 
-      while ( ( m_trainingSetAccuracy < m_desiredAccuracy 
-               || m_generalizationSetAccuracy < m_desiredAccuracy ) 
-             && m_currentEpoch < m_maxEpochs )
+      while ( (!StopFileWatcher::doesTheStopFileTellsMeToStop()) &&
+             ( ( m_trainingSetAccuracy < m_desiredAccuracy 
+                || m_generalizationSetAccuracy < m_desiredAccuracy ) 
+              && m_currentEpoch < m_maxEpochs )
+            )
         {
           // Use training set to train network
           RunEpoch( trainingData.m_trainingSet );
