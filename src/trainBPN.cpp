@@ -59,11 +59,12 @@ void configureCmdParser(cli::Parser& cmdParser)
                                       "                 values of the input nodes and the following ones are the\n"
                                       "                 expected values of the output nodes. The number of values\n"
                                       "                 must fit the number of intput/output nodes.\n"
-                                      "     text,       Format is \"<text>\",<expectedOutput> where the expected\n"
-                                      "                 output is given a comma separated list of integers. Size of\n"
-                                      "                 the inputs may not equal the number of input nodes. If less\n"
-                                      "                 then extra zeros are added. If more, extra characters are\n"
-                                      "                 ignored.");
+                                      "     binary,     First 4 bytes is the number of data, next 4 bytes is the\n"
+                                      "                 number of input values in each data, next 4 bytes is the\n"
+                                      "                 number of output values in each data. Then, each byte is\n"
+                                      "                 one data value. Each value is converted to a float by\n"
+                                      "                 dividing it by 255."
+                                      );
   cmdParser.set_optional<std::string>( "l", "layers", "[]", "Comma separated list of the layers sizes (e.g. 16,4,4,3 or 1,1,1).\n     First layer is the input neurons.\n     Last layer is the output layer." );
   cmdParser.set_optional<std::string>( "i", "import", "", "Import neural network from file before training. ( \"-\" stands for stdin)" );
   cmdParser.set_optional<std::string>( "e", "export", "", "Export neural network to file after training. ( \"-\" stands for stdout)" );
@@ -218,12 +219,12 @@ int main( int argc, char* argv[] )
       exit(1);
     }
 
-  // Validation of the input format : eigher `numberList` or `text`.
+  // Validation of the input format : eigher `binary` or `numberList`.
   bpn::InputDataFormat inputDataFormat;
-  if ( format.compare("numberList") == 0 )
+  if ( format.compare("binary") == 0 )
+    inputDataFormat = bpn::binary;
+  else if ( format.compare("numberList") == 0 )
     inputDataFormat = bpn::numberList;
-  else if ( format.compare("text") == 0 )
-    inputDataFormat = bpn::text;
   else
     throw std::runtime_error("Invalid format for input data. For more help use --help or -h.");
 

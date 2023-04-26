@@ -16,8 +16,8 @@ namespace bpn
 {
   enum InputDataFormat
     {
+      binary,
       numberList,
-      text
     };
 
   class DataReader

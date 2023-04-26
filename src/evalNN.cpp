@@ -66,10 +66,10 @@ int main( int argc, char* argv[] )
   int32_t           verbosity          = cmdParser.get<int32_t>( "v" );
 
   bpn::InputDataFormat inputDataFormat;
+  if ( format.compare("binary") == 0 )
+    inputDataFormat = bpn::binary;
   if ( format.compare("numberList") == 0 )
     inputDataFormat = bpn::numberList;
-  else if ( format.compare("text") == 0 )
-    inputDataFormat = bpn::text;
   else
     throw std::runtime_error("Invalid format for input data. For more help use --help or -h.");
 
