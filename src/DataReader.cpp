@@ -165,7 +165,7 @@ namespace bpn
               for ( int i=0; i < m_numInputs; ++i )
                 {
                   double d;
-                  int x;
+                  int x = 0;
                   m_dataStream->read((char*)&x, sizeof(char));
                   d = (1.0 * x) / 255;
                   entry.m_inputs.push_back( d );
@@ -173,7 +173,7 @@ namespace bpn
 
               for ( int i=0; i < m_numOutputs; ++i )
                 {
-                  int x;
+                  int x = 0;
                   m_dataStream->read((char*)&x, sizeof(char));
                   entry.m_expectedOutputs.push_back( x );
                 }
