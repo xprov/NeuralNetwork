@@ -31,7 +31,7 @@ format = numberList
 ###     First layer is the input neurons.
 ###     Last layer is the output layer.
 ### The default value is '[]'.
-layers = 784,5,7,5,10
+layers = 784,20,20,10
 
 ### Import an existing neural network
 ###    Import neural network from file before training. ( "-" stands for stdin)
@@ -54,7 +54,7 @@ activation = Sigmoid(1)
 ### The training will stop after that much iterations completed 
 ### Note that `-1` stands for `2^64-1`.
 ### The default value is '100'.
-maxEpoch = 20
+maxEpoch = 100
 
 
 ### Learning rate
@@ -79,7 +79,7 @@ maxEpoch = 20
 ### Accuracy
 ### Desired accuracy. Training stops when the desired accuracy is obtained.
 ### The default value is '95.000000'.
-accuracy = 82.0
+accuracy = 99.0
 
 ### Labels for output nodes. Comma separated list of work without white spaces.
 ### Only for new networks and is only used with the GUI visualization tool.
