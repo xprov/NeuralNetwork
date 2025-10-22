@@ -82,14 +82,13 @@ void configureCmdParser(cli::Parser& cmdParser)
   cmdParser.set_optional<std::string>( "L", "labels", "", "Labels for output nodes. Comma separated list of work without white spaces.\n"
                                       "   Only for new networks and is only used with the GUI visualization tool.");
   cmdParser.set_optional<int32_t>( "v", "verbosity", 1, "Verbosity level.\n     Level 0: quiet mode.\n     Level 1: prints training evolution.\n     Level 2: prints NN at initialization and at the end.\n     Level 3: prints NN at every iteration of the learning phase." );
+  cmdParser.set_optional<std::string>( "sf", "stopFile", "myStopFile", "Path to stop file. If this file exists and starts with `1`, the training will stop gracefully at the end of the current epoch." );
 }
 
 
 int main( int argc, char* argv[] )
 {
 
-
-  StopFileWatcher::init("myStopFile");
 
 
   //
@@ -107,6 +106,7 @@ int main( int argc, char* argv[] )
   std::string importFile;
   std::string exportFile;
   std::string activationFunction;
+  std::string stopFile;
   uint64_t    maxEpoch;
   double      learningRate;
   double      momentum;
@@ -164,6 +164,7 @@ int main( int argc, char* argv[] )
       importFile         = cfParser.get<std::string>( "import", "" );
       exportFile         = cfParser.get<std::string>( "export", "" );
       activationFunction = cfParser.get<std::string>( "activation", "Sigmoid(1)" );
+      stopFile           = cfParser.get<std::string>( "stopFile", "" );
       maxEpoch           = cfParser.get<uint64_t>( "maxEpoch", 100 );
       learningRate       = cfParser.get<double>( "learningRate", 0.01 );
       momentum           = cfParser.get<double>( "momentum", 0.9 );
@@ -191,6 +192,7 @@ int main( int argc, char* argv[] )
       importFile         = cmdParser.get<std::string>( "i" );
       exportFile         = cmdParser.get<std::string>( "e" );
       activationFunction = cmdParser.get<std::string>( "s" );
+      stopFile           = cmdParser.get<std::string>( "sf");
       maxEpoch           = cmdParser.get<uint64_t>( "m" );
       learningRate       = cmdParser.get<double>( "r" );
       momentum           = cmdParser.get<double>( "mom" );
@@ -230,6 +232,9 @@ int main( int argc, char* argv[] )
 
   // Load activation function
   bpn::ActivationFunction* sigma = bpn::ActivationFunction::deserialize( activationFunction );
+
+  // Set the stopfile watcher
+  StopFileWatcher::init(stopFile.c_str());
 
   // Create neural network
   bpn::Network* nn = NULL;
